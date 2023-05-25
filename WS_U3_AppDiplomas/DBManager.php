@@ -33,7 +33,7 @@ class DBManager {
     {
         $link = $this->open();
 
-        $sql = "INSERT INTO usuario (username, password, tipo_usuario) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO usuario (username, password, tipo_usuario) VALUES (?, SHA1(?), ?)";
 
         $stmt = $link->prepare($sql);
         $stmt->bind_param("sss", $username, $password, $tipo_usuario);
@@ -100,6 +100,27 @@ class DBManager {
             die("Error al mostrar los participantes");
         }
     }
+
+    public function userExist($username, $password)
+    {
+        $link = $this->open();
+        $sql = "SELECT * FROM usuario WHERE username = ? AND password = SHA1(?)";
+
+        $stmt = $link->prepare($sql);
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        $this->close($link);
+
+        if ($result->num_rows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     
 
     public function login($username, $password)
