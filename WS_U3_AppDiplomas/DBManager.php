@@ -71,6 +71,37 @@ class DBManager {
         return $user;
     }
 
+    public function showParticipants($nombre = null)
+    {
+        $link = $this->open();
+    
+        $result = null;
+    
+        if ($nombre) {
+            $sql = "SELECT * FROM Participante as p WHERE p.nombre LIKE ?";
+            $stmt = $link->prepare($sql);
+            $nombre = "%$nombre%"; 
+            $stmt->bind_param("s", $nombre);
+            $stmt->execute();
+            $result = $stmt->get_result();
+        } else {
+            $sql = "SELECT * FROM Participante";
+            $result = mysqli_query($link, $sql);
+        }
+    
+        if ($result) {
+            $rows = [];
+            while($columns = mysqli_fetch_array($result, MYSQLI_ASSOC)) {
+                $rows[] = $columns;
+            }
+            $this->close($link);
+            return $rows;
+        } else {
+            die("Error al mostrar los participantes");
+        }
+    }
+    
+
     public function login($username, $password)
     {
         $link = $this->open();
