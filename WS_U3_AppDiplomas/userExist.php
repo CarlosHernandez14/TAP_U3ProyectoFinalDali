@@ -12,6 +12,6 @@ if (isset($_GET["username"]) && isset($_GET["password"])) {
     $password = $_GET["password"];
 }
 
-echo $db->userExist($username, $password);
+echo json_encode($db->userExist($username, $password));
 
 ?>

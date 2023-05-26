@@ -4,17 +4,35 @@
  */
 package com.mycompany.tap_u3proyectofinaldali;
 
+import com.mycompany.domain.Usuario;
+import com.mycompany.tap_u3proyectofinaldali.director.VentanaPrincipalDirector;
+import com.mycompany.tap_u3proyectofinaldali.documentos.VentanaPrincipalDocumentos;
+import com.mycompany.tap_u3proyectofinaldali.participante.VentanaPrincipalParticipante;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import org.apache.http.client.fluent.Request;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 /**
  *
  * @author charl
  */
 public class LoginForm extends javax.swing.JFrame {
 
+    private String url = "https://localhost/WS_U3_AppDiplomas/";
+
     /**
      * Creates new form LoginForm
      */
     public LoginForm() {
         initComponents();
+        this.setLocationRelativeTo(null);
+
     }
 
     /**
@@ -30,7 +48,7 @@ public class LoginForm extends javax.swing.JFrame {
         panelImage1 = new org.edisoncor.gui.panel.PanelImage();
         textfieldUser = new javax.swing.JTextField();
         passwordField = new javax.swing.JPasswordField();
-        jButton1 = new javax.swing.JButton();
+        btnLogin = new javax.swing.JButton();
 
         jRadioButtonMenuItem1.setSelected(true);
         jRadioButtonMenuItem1.setText("jRadioButtonMenuItem1");
@@ -42,19 +60,22 @@ public class LoginForm extends javax.swing.JFrame {
         textfieldUser.setBackground(new java.awt.Color(255, 168, 215));
         textfieldUser.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         textfieldUser.setForeground(new java.awt.Color(255, 255, 255));
-        textfieldUser.setText("jTextField1");
         textfieldUser.setBorder(null);
 
         passwordField.setBackground(new java.awt.Color(255, 168, 215));
         passwordField.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         passwordField.setForeground(new java.awt.Color(255, 255, 255));
-        passwordField.setText("jPasswordField1");
         passwordField.setBorder(null);
 
-        jButton1.setBackground(new java.awt.Color(206, 183, 255));
-        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jButton1.setForeground(new java.awt.Color(255, 255, 255));
-        jButton1.setText("Iniciar Sesion");
+        btnLogin.setBackground(new java.awt.Color(206, 183, 255));
+        btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        btnLogin.setForeground(new java.awt.Color(255, 255, 255));
+        btnLogin.setText("Iniciar Sesion");
+        btnLogin.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                btnLoginMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
         panelImage1.setLayout(panelImage1Layout);
@@ -69,7 +90,7 @@ public class LoginForm extends javax.swing.JFrame {
                             .addComponent(passwordField, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE))
                         .addGap(302, 302, 302))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelImage1Layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 165, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(357, 357, 357))))
         );
         panelImage1Layout.setVerticalGroup(
@@ -80,7 +101,7 @@ public class LoginForm extends javax.swing.JFrame {
                 .addGap(99, 99, 99)
                 .addComponent(passwordField, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(54, 54, 54)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(70, Short.MAX_VALUE))
         );
 
@@ -97,6 +118,51 @@ public class LoginForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoginMouseClicked
+        String username = this.textfieldUser.getText();
+        String password = new String(this.passwordField.getPassword());
+
+        String endpoint = this.url + "userExist.php?username=" + username + "&password=" + password;
+
+        try {
+            String result = Request.Get(endpoint).execute().returnContent().asString();
+            
+            if (result.contains("false")) {
+                JOptionPane.showMessageDialog(null, "Usuario y/o contrasena incorrectos");
+                return;
+            }
+            
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(result);
+
+            Usuario usuario = new Usuario(
+                    Integer.parseInt(json.get("idUsuario").toString()),
+                    json.get("username").toString(),
+                    json.get("password").toString(),
+                    json.get("tipo_usuario").toString()
+            );
+            
+            switch (usuario.getTipo_usuario()){
+                case "documentos":
+                    new VentanaPrincipalDocumentos().setVisible(true);
+                    break;
+                case "director":
+                    new VentanaPrincipalDirector().setVisible(true);
+                    break;
+                case "participante":
+                    new VentanaPrincipalParticipante().setVisible(true);
+                    break;
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }//GEN-LAST:event_btnLoginMouseClicked
 
     /**
      * @param args the command line arguments
@@ -134,7 +200,7 @@ public class LoginForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton btnLogin;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private org.edisoncor.gui.panel.PanelImage panelImage1;
     private javax.swing.JPasswordField passwordField;

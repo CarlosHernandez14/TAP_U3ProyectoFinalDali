@@ -115,34 +115,11 @@ class DBManager {
         $this->close($link);
 
         if ($result->num_rows > 0) {
-            return true;
+            $user = $result->fetch_assoc();
+            return $user;
         } else {
             return false;
         }
-    }
-
-    
-
-    public function login($username, $password)
-    {
-        $link = $this->open();
-
-        $sql = "SELECT * FROM usuario WHERE username = ? AND password = SHA1(?)";
-        
-        $stmt = $link->prepare($sql);
-        $stmt->bind_param("ss", $username, $password);
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $user = $result->fetch_assoc();
-
-        $stmt->close();
-        $this->close($link);
-
-        if ($user) {
-            return $user;
-        }
-        return false;
     }
 
     public function updateUser($idUsuario, $username, $password, $tipo_usuario)
