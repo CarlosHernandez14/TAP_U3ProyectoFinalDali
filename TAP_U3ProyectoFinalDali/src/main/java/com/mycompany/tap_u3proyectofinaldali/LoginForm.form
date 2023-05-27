@@ -44,7 +44,7 @@
     <Container class="org.edisoncor.gui.panel.PanelImage" name="panelImage1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="2" name="C:\Users\charl\Documents\NetBeansProjects\TAP_U3ProyectoFinalDali\src\main\java\com\mycompany\images\Login.jpg"/>
+          <Image iconType="2" name="C:\Users\Charly\Documents\GitHubRepos\TAP_U3ProyectoFinalDali\TAP_U3ProyectoFinalDali\src\main\java\com\mycompany\images\Login.jpg"/>
         </Property>
       </Properties>
 

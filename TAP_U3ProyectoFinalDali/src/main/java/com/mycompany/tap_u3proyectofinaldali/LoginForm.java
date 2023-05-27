@@ -9,10 +9,16 @@ import com.mycompany.tap_u3proyectofinaldali.director.VentanaPrincipalDirector;
 import com.mycompany.tap_u3proyectofinaldali.documentos.VentanaPrincipalDocumentos;
 import com.mycompany.tap_u3proyectofinaldali.participante.VentanaPrincipalParticipante;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.apache.http.client.fluent.Request;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -24,7 +30,7 @@ import org.json.simple.parser.ParseException;
  */
 public class LoginForm extends javax.swing.JFrame {
 
-    private String url = "https://localhost/WS_U3_AppDiplomas/";
+    private String url = "http://localhost/WS_U3_AppDiplomas/";
 
     /**
      * Creates new form LoginForm
@@ -55,7 +61,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        panelImage1.setIcon(new javax.swing.ImageIcon("C:\\Users\\charl\\Documents\\NetBeansProjects\\TAP_U3ProyectoFinalDali\\src\\main\\java\\com\\mycompany\\images\\Login.jpg")); // NOI18N
+        panelImage1.setIcon(new javax.swing.ImageIcon("C:\\Users\\Charly\\Documents\\GitHubRepos\\TAP_U3ProyectoFinalDali\\TAP_U3ProyectoFinalDali\\src\\main\\java\\com\\mycompany\\images\\Login.jpg")); // NOI18N
 
         textfieldUser.setBackground(new java.awt.Color(255, 168, 215));
         textfieldUser.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -120,19 +126,24 @@ public class LoginForm extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnLoginMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnLoginMouseClicked
-        String username = this.textfieldUser.getText();
-        String password = new String(this.passwordField.getPassword());
-
-        String endpoint = this.url + "userExist.php?username=" + username + "&password=" + password;
-
         try {
+            String username = this.textfieldUser.getText();
+            String password = new String(this.passwordField.getPassword());
+
+            //String url = "http://localhost/WS_U3_AppDiplomas/";
+
+            String endpoint = url + "userExist.php?username=" + username + "&password=" + password;
+
+            System.out.println(endpoint);
+
             String result = Request.Get(endpoint).execute().returnContent().asString();
-            
+
+            System.out.println("RESULT=" + result);
             if (result.contains("false")) {
                 JOptionPane.showMessageDialog(null, "Usuario y/o contrasena incorrectos");
                 return;
             }
-            
+
             JSONParser parser = new JSONParser();
             JSONObject json = (JSONObject) parser.parse(result);
 
@@ -143,25 +154,19 @@ public class LoginForm extends javax.swing.JFrame {
                     json.get("tipo_usuario").toString()
             );
             
-            switch (usuario.getTipo_usuario()){
-                case "documentos":
+            System.out.println("TIPO DE USUARIO: " + usuario.getTipo_usuario());
+
+            switch (usuario.getTipo_usuario()) {
+                case "documentos" ->
                     new VentanaPrincipalDocumentos().setVisible(true);
-                    break;
-                case "director":
-                    new VentanaPrincipalDirector().setVisible(true);
-                    break;
-                case "participante":
+                //new VentanaPrincipalDirector().setVisible(true);
+                case "participante" ->
                     new VentanaPrincipalParticipante().setVisible(true);
-                    break;
             }
-
-        } catch (IOException ex) {
-            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Error al mostrar");
         }
-
-
     }//GEN-LAST:event_btnLoginMouseClicked
 
     /**
