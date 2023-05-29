@@ -18,13 +18,13 @@ public class Participante {
 
     public Participante() {
     }
-
-    public Participante(String nombre, byte[] foto, String numero_control, String carrera, int Usuario_idUsuario) {
+    
+    // Constructor para creare participantes
+    public Participante(String nombre, byte[] foto, String numero_control, String carrera) {
         this.nombre = nombre;
         this.foto = foto;
         this.numero_control = numero_control;
         this.carrera = carrera;
-        this.Usuario_idUsuario = Usuario_idUsuario;
     }
 
     public Participante(int idParticipante, String nombre, byte[] foto, String numero_control, String carrera, int Usuario_idUsuario) {

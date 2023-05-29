@@ -14,6 +14,6 @@ if (isset($_POST["username"]) && isset($_POST["password"])) {
 }
 
 // Prints true of alse 
-echo $db->addUser($username, $password, $tipo_usuario);
+echo $db->createUser($username, $password, $tipo_usuario);
 
 ?>

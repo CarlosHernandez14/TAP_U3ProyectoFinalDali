@@ -20,26 +20,25 @@ public class Evento {
     private Date fecha;
     private Time hora;
     private String tipo_formato;
-    private int Usuario_idUsuario;
+    private int Usuario_idCreador;
     
     private ArrayList<Participante> participantes;
 
     public Evento() {
     }
 
-    public Evento(int Director_idDirector, boolean validado, String nombre, Date fecha, Time hora, String tipo_formato, int Usuario_idUsuario, ArrayList<Participante> participantes) {
+    public Evento(int Director_idDirector, boolean validado, String nombre, Date fecha, Time hora, String tipo_formato, int Usuario_idCreador) {
         this.Director_idDirector = Director_idDirector;
         this.validado = validado;
         this.nombre = nombre;
         this.fecha = fecha;
         this.hora = hora;
         this.tipo_formato = tipo_formato;
-        this.Usuario_idUsuario = Usuario_idUsuario;
-        this.participantes = participantes;
+        this.Usuario_idCreador = Usuario_idCreador;
     }
     
     // Constructor para consulta
-    public Evento(int idEvento, int Director_idDirector, boolean validado, String nombre, Date fecha, Time hora, String tipo_formato, int Usuario_idUsuario, ArrayList<Participante> participantes) {
+    public Evento(int idEvento, int Director_idDirector, boolean validado, String nombre, Date fecha, Time hora, String tipo_formato, int Usuario_idCreador, ArrayList<Participante> participantes) {
         this.idEvento = idEvento;
         this.Director_idDirector = Director_idDirector;
         this.validado = validado;
@@ -47,7 +46,7 @@ public class Evento {
         this.fecha = fecha;
         this.hora = hora;
         this.tipo_formato = tipo_formato;
-        this.Usuario_idUsuario = Usuario_idUsuario;
+        this.Usuario_idCreador = Usuario_idCreador;
         this.participantes = participantes;
     }
 
@@ -107,18 +106,24 @@ public class Evento {
         this.tipo_formato = tipo_formato;
     }
 
-    public int getUsuario_idUsuario() {
-        return Usuario_idUsuario;
+    public int getUsuario_idCreador() {
+        return Usuario_idCreador;
     }
 
-    public void setUsuario_idUsuario(int Usuario_idUsuario) {
-        this.Usuario_idUsuario = Usuario_idUsuario;
+    public void setUsuario_idCreador(int Usuario_idCreador) {
+        this.Usuario_idCreador = Usuario_idCreador;
+    }
+    
+    public ArrayList<Participante> getParticipantes() {
+        return participantes;
     }
 
+    public void setParticipantes(ArrayList<Participante> participantes) {
+        this.participantes = participantes;
+    }
+    
     @Override
     public String toString() {
-        return "Evento{" + "idEvento=" + idEvento + ", Director_idDirector=" + Director_idDirector + ", validado=" + validado + ", nombre=" + nombre + ", fecha=" + fecha + ", hora=" + hora + ", tipo_formato=" + tipo_formato + ", Usuario_idUsuario=" + Usuario_idUsuario + '}';
+        return "Evento{" + "idEvento=" + idEvento + ", Director_idDirector=" + Director_idDirector + ", validado=" + validado + ", nombre=" + nombre + ", fecha=" + fecha + ", hora=" + hora + ", tipo_formato=" + tipo_formato + ", Usuario_idCreador=" + Usuario_idCreador + '}';
     }
-    
-    
 }

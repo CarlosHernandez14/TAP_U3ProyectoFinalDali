@@ -8,6 +8,7 @@ import com.mycompany.domain.Usuario;
 import com.mycompany.tap_u3proyectofinaldali.director.VentanaPrincipalDirector;
 import com.mycompany.tap_u3proyectofinaldali.documentos.VentanaPrincipalDocumentos;
 import com.mycompany.tap_u3proyectofinaldali.participante.VentanaPrincipalParticipante;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -61,7 +62,7 @@ public class LoginForm extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        panelImage1.setIcon(new javax.swing.ImageIcon("C:\\Users\\Charly\\Documents\\GitHubRepos\\TAP_U3ProyectoFinalDali\\TAP_U3ProyectoFinalDali\\src\\main\\java\\com\\mycompany\\images\\Login.jpg")); // NOI18N
+        panelImage1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Login.jpg"))); // NOI18N
 
         textfieldUser.setBackground(new java.awt.Color(255, 168, 215));
         textfieldUser.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -72,6 +73,11 @@ public class LoginForm extends javax.swing.JFrame {
         passwordField.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         passwordField.setForeground(new java.awt.Color(255, 255, 255));
         passwordField.setBorder(null);
+        passwordField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                passwordFieldKeyTyped(evt);
+            }
+        });
 
         btnLogin.setBackground(new java.awt.Color(206, 183, 255));
         btnLogin.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -154,11 +160,13 @@ public class LoginForm extends javax.swing.JFrame {
                     json.get("tipo_usuario").toString()
             );
             
+            System.out.println(usuario.toString());
+            
             System.out.println("TIPO DE USUARIO: " + usuario.getTipo_usuario());
 
             switch (usuario.getTipo_usuario()) {
                 case "documentos" ->
-                    new VentanaPrincipalDocumentos().setVisible(true);
+                    new VentanaPrincipalDocumentos(usuario).setVisible(true);
                 //new VentanaPrincipalDirector().setVisible(true);
                 case "participante" ->
                     new VentanaPrincipalParticipante().setVisible(true);
@@ -168,6 +176,14 @@ public class LoginForm extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Error al mostrar");
         }
     }//GEN-LAST:event_btnLoginMouseClicked
+
+    private void passwordFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_passwordFieldKeyTyped
+        char keyTyped = evt.getKeyChar();
+        if (keyTyped == KeyEvent.VK_ENTER) {
+            System.out.println("SE PRESIONO LA TECLA ENTER");
+            this.btnLoginMouseClicked(null);
+        }
+    }//GEN-LAST:event_passwordFieldKeyTyped
 
     /**
      * @param args the command line arguments

@@ -4,17 +4,77 @@
  */
 package com.mycompany.tap_u3proyectofinaldali.documentos;
 
+import com.mycompany.data.WSManager;
+import com.mycompany.domain.Director;
+import com.mycompany.domain.Evento;
+import com.mycompany.domain.Usuario;
+import java.awt.Dimension;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BoxLayout;
+import org.json.simple.parser.ParseException;
+
 /**
  *
  * @author charl
  */
 public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
-
+    
+    private Usuario usuario;
+    private WSManager ws;
+    
+    private Director director;
+    
+    private ArrayList<Evento> eventos;
+    
     /**
      * Creates new form VentanaPrincipalDocumentos
      */
     public VentanaPrincipalDocumentos() {
         initComponents();
+        this.setLocationRelativeTo(null); 
+    }
+    
+    public VentanaPrincipalDocumentos(Usuario usuario) {
+        initComponents();
+        this.setLocationRelativeTo(null); 
+        this.usuario = usuario;
+        this.ws = new WSManager();
+        
+        try {
+            this.director = this.ws.getActiveDirector();
+        } catch (IOException ex) {
+            Logger.getLogger(VentanaPrincipalDocumentos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(VentanaPrincipalDocumentos.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+        this.containerEventos.setLayout(new BoxLayout(this.containerEventos, BoxLayout.Y_AXIS));
+        initDatos();
+    }
+    
+    public void initDatos(){
+        try {
+            this.containerEventos.removeAll();
+            // Listamos los eventos en el container
+            this.eventos = this.ws.showEvents();
+            
+            for (Evento evento : eventos) {
+                PanelEvento panelE = new PanelEvento(evento, director);
+                panelE.setMaximumSize(new Dimension(550, 85));
+                panelE.setPreferredSize(new Dimension(575, 85));
+                this.containerEventos.add(panelE);
+            }
+            
+            this.containerEventos.revalidate();
+            this.containerEventos.repaint();
+            
+        } catch (IOException ex) {
+            Logger.getLogger(VentanaPrincipalDocumentos.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -27,20 +87,87 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
     private void initComponents() {
 
         panelImage1 = new org.edisoncor.gui.panel.PanelImage();
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        containerEventos = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
+        buttonNuevoEvento = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        panelImage1.setIcon(new javax.swing.ImageIcon("C:\\Users\\Charly\\Documents\\GitHubRepos\\TAP_U3ProyectoFinalDali\\TAP_U3ProyectoFinalDali\\src\\main\\java\\com\\mycompany\\images\\image-BackgroundDocs.png")); // NOI18N
+        panelImage1.setIcon(new javax.swing.ImageIcon("C:\\Users\\charl\\Documents\\GitHub\\TAP_U3ProyectoFinalDali\\TAP_U3ProyectoFinalDali\\src\\main\\java\\com\\mycompany\\images\\image-BackgroundDocs.png")); // NOI18N
+
+        jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
+        jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+
+        containerEventos.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout containerEventosLayout = new javax.swing.GroupLayout(containerEventos);
+        containerEventos.setLayout(containerEventosLayout);
+        containerEventosLayout.setHorizontalGroup(
+            containerEventosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 563, Short.MAX_VALUE)
+        );
+        containerEventosLayout.setVerticalGroup(
+            containerEventosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 402, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(containerEventos);
+
+        jTabbedPane1.addTab("Eventos", jScrollPane1);
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 563, Short.MAX_VALUE)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 402, Short.MAX_VALUE)
+        );
+
+        jScrollPane2.setViewportView(jPanel2);
+
+        jTabbedPane1.addTab("Participantes", jScrollPane2);
+
+        buttonNuevoEvento.setBackground(new java.awt.Color(255, 153, 255));
+        buttonNuevoEvento.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        buttonNuevoEvento.setForeground(new java.awt.Color(255, 255, 255));
+        buttonNuevoEvento.setText("Nuevo evento");
+        buttonNuevoEvento.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        buttonNuevoEvento.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonNuevoEventoMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
         panelImage1.setLayout(panelImage1Layout);
         panelImage1Layout.setHorizontalGroup(
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 813, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelImage1Layout.createSequentialGroup()
+                .addGap(25, 25, 25)
+                .addComponent(buttonNuevoEvento, javax.swing.GroupLayout.DEFAULT_SIZE, 185, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 565, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20))
         );
         panelImage1Layout.setVerticalGroup(
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 494, Short.MAX_VALUE)
+            .addGroup(panelImage1Layout.createSequentialGroup()
+                .addGroup(panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelImage1Layout.createSequentialGroup()
+                        .addGap(44, 44, 44)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 435, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(panelImage1Layout.createSequentialGroup()
+                        .addGap(150, 150, 150)
+                        .addComponent(buttonNuevoEvento, javax.swing.GroupLayout.PREFERRED_SIZE, 49, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -57,6 +184,10 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void buttonNuevoEventoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonNuevoEventoMouseClicked
+        new CrearEventoForm(this.usuario).setVisible(true);
+    }//GEN-LAST:event_buttonNuevoEventoMouseClicked
+    
     /**
      * @param args the command line arguments
      */
@@ -93,6 +224,12 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonNuevoEvento;
+    private javax.swing.JPanel containerEventos;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTabbedPane jTabbedPane1;
     private org.edisoncor.gui.panel.PanelImage panelImage1;
     // End of variables declaration//GEN-END:variables
 }
