@@ -173,16 +173,17 @@ class DBManager {
         }
     }
 
-    public function showParticipants($nombre = null)
+    // Filtra por numero de control si se le envia
+    public function showParticipants($numero_control = null)
     {
         $link = $this->open();
 
         $result = null;
 
-        if ($nombre) {
-            $sql = "SELECT * FROM Participante as p WHERE p.nombre LIKE ?";
+        if ($numero_control) {
+            $sql = "SELECT * FROM Participante as p WHERE p.numero_control LIKE ?";
             $stmt = $link->prepare($sql);
-            $nombre = "%$nombre%";
+            $nombre = "%$numero_control%";
             $stmt->bind_param("s", $nombre);
             $stmt->execute();
             $result = $stmt->get_result();
@@ -206,6 +207,65 @@ class DBManager {
             die("Error al mostrar los participantes");
         }
         
+    }
+
+    public function showEventsParticipant($participantId)
+    {
+        $link = $this->open();
+
+        $sql = "SELECT * FROM item_evento INNER JOIN evento ON (item_evento.Evento_idEvento = evento.idEvento) WHERE Participante_idParticipante = ".$participantId;
+
+        $result = mysqli_query($link, $sql);
+
+        if ($result) {
+            $events = array();
+            while ($row = mysqli_fetch_assoc($result)) {
+                $events[] = $row;
+            }
+            return $events;
+        } else {
+            $this->close($link);
+            die("Error al mostrar los eventos del participante");
+        }
+    }
+
+    public function countParticipants($eventId) {
+        $link = $this->open();
+    
+        $sql = "SELECT COUNT(*) FROM item_evento WHERE Evento_idEvento = ?";
+
+        $stmt = mysqli_prepare($link, $sql);
+
+        mysqli_stmt_bind_param($stmt, "s", $eventId);
+        mysqli_stmt_execute($stmt);
+    
+        mysqli_stmt_bind_result($stmt, $count);
+        $resultado = mysqli_stmt_fetch($stmt);
+    
+        mysqli_stmt_close($stmt);
+        $this->close($link);
+        
+        return $count; 
+    }
+
+    public function validateEvent($eventId) {
+        $link = $this->open();
+    
+        $sql = "UPDATE Evento SET validado = 1 WHERE idEvento = ?";
+    
+        $stmt = mysqli_prepare($link, $sql);
+    
+        mysqli_stmt_bind_param($stmt, "s", $eventId);
+    
+        if (mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_close($stmt);
+            $this->close($link);
+            return true;
+        } else {
+            mysqli_stmt_close($stmt);
+            $this->close($link);
+            return false;
+        }
     }
 
 

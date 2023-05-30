@@ -27,6 +27,8 @@ public class PanelEvento extends javax.swing.JPanel {
     private Director director;
     private WSManager ws;
     
+    private VentanaPrincipalDocumentos ventanaPrincipalDocumentos;
+    
     private ArrayList<Participante> participants;
     
     /**
@@ -36,11 +38,12 @@ public class PanelEvento extends javax.swing.JPanel {
         initComponents();
     }
     
-    public PanelEvento(Evento evento, Director director) {
+    public PanelEvento(Evento evento, Director director, VentanaPrincipalDocumentos ventanaPrincipalDocumentos) {
         initComponents();
         this.evento = evento;
         this.director = director;
         this.ws = new WSManager();
+        this.ventanaPrincipalDocumentos = ventanaPrincipalDocumentos;
         
         try {
             this.participants = this.ws.showParticipants(null);
@@ -96,6 +99,8 @@ public class PanelEvento extends javax.swing.JPanel {
         menuParticipantes = new javax.swing.JPopupMenu();
         itemAddParticipants = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
+        hintParticipants = new javax.swing.JPopupMenu();
+        itemHintParticipants = new javax.swing.JMenuItem();
         buttonEliminar = new javax.swing.JButton();
         buttonEditar = new javax.swing.JButton();
         labelNombreEvento = new javax.swing.JLabel();
@@ -103,6 +108,7 @@ public class PanelEvento extends javax.swing.JPanel {
         labelHora = new javax.swing.JLabel();
         buttonStatus = new javax.swing.JButton();
         buttonParticipantes = new javax.swing.JButton();
+        buttonImprimir = new javax.swing.JButton();
 
         itemStatus.setForeground(new java.awt.Color(255, 0, 0));
         itemStatus.setText("Sin validar");
@@ -119,9 +125,13 @@ public class PanelEvento extends javax.swing.JPanel {
         menuParticipantes.add(itemAddParticipants);
         menuParticipantes.add(jSeparator1);
 
+        itemHintParticipants.setText("Participantes");
+        hintParticipants.add(itemHintParticipants);
+
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(new org.edisoncor.gui.util.DropShadowBorder());
 
+        buttonEliminar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon-Borrar.png"))); // NOI18N
         buttonEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         buttonEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -131,6 +141,11 @@ public class PanelEvento extends javax.swing.JPanel {
 
         buttonEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon-Editar.png"))); // NOI18N
         buttonEditar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        buttonEditar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonEditarMouseClicked(evt);
+            }
+        });
 
         labelNombreEvento.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         labelNombreEvento.setForeground(new java.awt.Color(0, 0, 0));
@@ -153,12 +168,20 @@ public class PanelEvento extends javax.swing.JPanel {
             }
         });
 
-        buttonParticipantes.setText("Participantes");
+        buttonParticipantes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon-Participantes.png"))); // NOI18N
         buttonParticipantes.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 buttonParticipantesMouseClicked(evt);
             }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                buttonParticipantesMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                buttonParticipantesMouseExited(evt);
+            }
         });
+
+        buttonImprimir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon-Imprimir.png"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -172,13 +195,15 @@ public class PanelEvento extends javax.swing.JPanel {
                         .addComponent(labelFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(labelHora, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(21, 21, 21)
-                .addComponent(buttonParticipantes)
-                .addGap(18, 18, 18)
+                .addGap(52, 52, 52)
+                .addComponent(buttonImprimir)
+                .addGap(17, 17, 17)
+                .addComponent(buttonParticipantes, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(buttonStatus, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(buttonEditar, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(buttonEliminar, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -198,7 +223,8 @@ public class PanelEvento extends javax.swing.JPanel {
                     .addComponent(buttonEliminar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonEditar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(buttonStatus, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(buttonParticipantes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(buttonParticipantes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(buttonImprimir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(16, 16, 16))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -213,19 +239,35 @@ public class PanelEvento extends javax.swing.JPanel {
 
     private void buttonParticipantesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonParticipantesMouseClicked
         this.menuParticipantes.show(this.buttonParticipantes, WIDTH, this.buttonParticipantes.getHeight());
+        this.hintParticipants.setVisible(false);
     }//GEN-LAST:event_buttonParticipantesMouseClicked
 
     private void itemAddParticipantsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemAddParticipantsActionPerformed
         new CargarParticipantesForm(this.evento).setVisible(true);
     }//GEN-LAST:event_itemAddParticipantsActionPerformed
 
+    private void buttonParticipantesMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonParticipantesMouseEntered
+        this.hintParticipants.show(this.buttonParticipantes, WIDTH, -this.buttonParticipantes.getHeight());
+    }//GEN-LAST:event_buttonParticipantesMouseEntered
+
+    private void buttonParticipantesMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonParticipantesMouseExited
+        this.hintParticipants.setVisible(false);
+    }//GEN-LAST:event_buttonParticipantesMouseExited
+
+    private void buttonEditarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonEditarMouseClicked
+        new VentanaEditarEvento(evento, ventanaPrincipalDocumentos).setVisible(true);
+    }//GEN-LAST:event_buttonEditarMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonEditar;
     private javax.swing.JButton buttonEliminar;
+    private javax.swing.JButton buttonImprimir;
     private javax.swing.JButton buttonParticipantes;
     private javax.swing.JButton buttonStatus;
+    private javax.swing.JPopupMenu hintParticipants;
     private javax.swing.JMenuItem itemAddParticipants;
+    private javax.swing.JMenuItem itemHintParticipants;
     private javax.swing.JMenuItem itemStatus;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu.Separator jSeparator1;

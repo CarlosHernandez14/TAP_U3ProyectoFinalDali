@@ -32,6 +32,8 @@ public class CrearEventoForm extends javax.swing.JFrame {
     private Usuario usuario;
     private WSManager ws;
     
+    private VentanaPrincipalDocumentos ventanaPrincipalDocumentos;
+    
     private String templatesLocation = "src/main/java/com/mycompany/templates";
     private String imagesLoacation = "src/main/java/com/mycompany/images/";
     
@@ -42,8 +44,9 @@ public class CrearEventoForm extends javax.swing.JFrame {
         initComponents();
     }
     
-    public CrearEventoForm(Usuario usuario) {
+    public CrearEventoForm(Usuario usuario, VentanaPrincipalDocumentos ventanaPrincipalDocumentos) {
         initComponents();
+        this.ventanaPrincipalDocumentos = ventanaPrincipalDocumentos;
         this.setLocationRelativeTo(null);
         this.usuario = usuario;
         this.ws = new WSManager();
@@ -89,7 +92,7 @@ public class CrearEventoForm extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         panelImagePreview = new org.edisoncor.gui.panel.PanelImage();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         panel1.setColorPrimario(new java.awt.Color(255, 204, 255));
         panel1.setColorSecundario(new java.awt.Color(255, 51, 255));
@@ -256,6 +259,7 @@ public class CrearEventoForm extends javax.swing.JFrame {
                     this.usuario.getIdUsuario());
             
             if (this.ws.createEvento(evento)) {
+                this.ventanaPrincipalDocumentos.acutalizarVentana();
                 JOptionPane.showMessageDialog(null, "Evento creado con exito");
                 this.dispose();
             } else JOptionPane.showMessageDialog(null, "Error al crear el evento");

@@ -172,7 +172,11 @@ public class LoginForm extends javax.swing.JFrame {
                     break;
                 //new VentanaPrincipalDirector().setVisible(true);
                 case "participante":
-                    new VentanaPrincipalParticipante().setVisible(true);
+                    new VentanaPrincipalParticipante(usuario).setVisible(true);
+                    this.dispose();
+                    break;
+                case "Director":
+                    new VentanaPrincipalDirector(usuario).setVisible(true);
                     this.dispose();
                     break;
             }

@@ -45,7 +45,7 @@ public class WSManager {
     }
 
     public ArrayList<Participante> leerCSV(String archivoCSV) {
-        ArrayList<Participante> participantes = new ArrayList<>();
+        ArrayList<Participante> participantesCSV = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivoCSV))) {
             String linea;
@@ -58,13 +58,13 @@ public class WSManager {
                 // Otros atributos según tu clase "Participante"
 
                 Participante participante = new Participante(nombre, null, numero_control, carrera);
-                participantes.add(participante);
+                participantesCSV.add(participante);
             }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        return participantes;
+        return participantesCSV;
     }
 
     // Metodos de operaciones de Director 
@@ -75,10 +75,6 @@ public class WSManager {
         System.out.println("URL: " + endpoint);
 
         String result = Request.Get(endpoint).execute().returnContent().asString();
-        
-        
-        System.out.println("DESPUES DE EJECUTAR EL RESULT");
-        System.out.println("RESULT: " + result);
 
         if (result.contains("Error") || result.contains("null")) {
             JOptionPane.showMessageDialog(null, "Error al consultar el director actual");
@@ -132,7 +128,7 @@ public class WSManager {
         String endpoint = this.url + "createEvent.php";
 
         Form form = Form.form();
-        
+
         System.out.println(evento.toString());
 
         form.add("Director_idDirector", String.valueOf(evento.getDirector_idDirector()));
@@ -166,8 +162,8 @@ public class WSManager {
         return false;
     }
 
-    // No comprobado, porque aqui se manda llamar al de create item evento para cargar participantes
-    public boolean updateEvent(Evento evento) throws IOException {
+    // No comprobado, porque aqui se manda llamar al de create item evento para cargar participantesCSV
+    public boolean updateEvent(Evento evento, ArrayList<Participante> participantesCSV) throws IOException {
         String endpoint = this.url + "updateEvent.php";
 
         Form form = Form.form();
@@ -180,16 +176,58 @@ public class WSManager {
         form.add("hora", evento.getHora().toString());
         form.add("tipo_formato", evento.getTipo_formato());
 
-        //Mandamos los participantes com json
-        Gson gson = new Gson();
+        //Mandamos los participantesCSV com json
+        //Gson gson = new Gson();
+        ArrayList<Participante> participantesToCreateUser = new ArrayList<>();
 
-        // Creamos los participantes de los eventos en la DB
-        for (Participante participante : evento.getParticipantes()) {
+        // Comprobamos si alguno de los participantesCSV ya existe en la DB
+        ArrayList<Participante> participantes;
+
+        try {
+            boolean participantExists;
+            participantes = showParticipants(null);
+
+            for (Participante participanteCSV : participantesCSV) {
+                participantExists = false;
+
+                for (Participante participante : participantes) {
+                    if (participanteCSV.getNumero_control().equals(participante.getNumero_control())) {
+                        participantExists = true;
+                        JOptionPane.showMessageDialog(null, "El participante ya existe " + participante.getNombre() + " con numero_control " + participante.getNumero_control() + " ya existe");
+                        break;
+                    }
+                }
+
+                if (!participantExists) {
+                    participantesToCreateUser.add(participanteCSV);
+                }
+            }
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Error al cargar los participantes para verificar y cargar los nuevos al evento");
+
+            Logger.getLogger(WSManager.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+
+        // Creamos los participantesCSV de los eventos en la DB
+        for (Participante participante : participantesToCreateUser) {
             String[] userData = genUserData(participante);
             int idParticipante = createParticipant(participante, userData[0], userData[1]);
 
-            // Creamos la relacion entre el participante y evento creando un item evento
-            createItemEvento(idParticipante, evento.getIdEvento());
+        }
+
+        Gson gson = new Gson();
+        // Agregamos todo slos participantes del CSV al evento
+        try {
+            for (Participante participante : participantesCSV) {
+
+                ArrayList<Participante> participanteNum_Control = this.showParticipants(participante.getNumero_control());
+
+                createItemEvento(participanteNum_Control.get(0).getIdParticipante(), evento.getIdEvento());
+            }
+        } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "Error al agregar los participantes CSV al evento");
+            Logger.getLogger(WSManager.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         String resultado = Request.Post(endpoint)
@@ -198,15 +236,13 @@ public class WSManager {
                 .returnContent()
                 .asString();
 
-        int res = 0;
         if (!resultado.contains("Error")) {
             System.out.println("RESULTADO: " + resultado);
-            res = Integer.parseInt(resultado);
+            return true;
         } else {
             System.out.println(resultado);
+            return false;
         }
-
-        return res > 0;
     }
 
     public String[] genUserData(Participante p) {
@@ -284,6 +320,54 @@ public class WSManager {
         return null;
     }
 
+    public ArrayList<Evento> showEventsParticipant(int idParticipant) throws IOException {
+        String endpoint = this.url + "showEventsParticipant.php";
+
+        Form form = Form.form();
+        form.add("idParticipant", String.valueOf(idParticipant));
+
+        String result = Request.Post(endpoint)
+                .bodyForm(form.build())
+                .execute()
+                .returnContent()
+                .asString();
+
+        ArrayList<Evento> events = new ArrayList<>();
+        
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> {
+            LocalDate localDate = LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE);
+            return Date.valueOf(localDate);
+        });
+        gsonBuilder.registerTypeAdapter(Time.class, (JsonDeserializer<Time>) (json, typeOfT, context) -> {
+            LocalTime localTime = LocalTime.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_TIME);
+            return Time.valueOf(localTime);
+        });
+
+        Gson gson = gsonBuilder.create();
+        
+        
+        if (!result.contains("Error")) {
+            try {
+                JSONParser parser = new JSONParser();
+                JSONArray jsonArray = (JSONArray) parser.parse(result);
+
+                for (Object object : jsonArray) {
+                    JSONObject jsonOB = (JSONObject) object;
+                    Evento event = gson.fromJson(object.toString(), Evento.class);
+
+                    events.add(event);
+                }
+                return events;
+            } catch (ParseException ex) {
+                Logger.getLogger(WSManager.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            System.out.println("ERROR ARROJADO: " + result);
+        }
+        return null;
+    }
+
     // METODOS PARA OPERACIONES DE ITEM EVENTO EN EL WEB SERVICE
     public boolean createItemEvento(int idParticipante, int idEvento) throws IOException {
         String endpoint = this.url + "createItemEvento.php";
@@ -340,12 +424,12 @@ public class WSManager {
         }
     }
 
-    public ArrayList<Participante> showParticipants(String nombre) throws IOException, ParseException {
+    public ArrayList<Participante> showParticipants(String numero_control) throws IOException, ParseException {
         ArrayList<Participante> participantes = new ArrayList<>();
         String endpoint;
 
-        if (nombre != null) {
-            endpoint = this.url + "showParticipants.php?nombre=" + nombre;
+        if (numero_control != null) {
+            endpoint = this.url + "showParticipants.php?numero_control=" + numero_control;
         } else {
             endpoint = this.url + "showParticipants.php";
         }
@@ -380,12 +464,40 @@ public class WSManager {
 
         return null;
     }
-    
-    public ArrayList<Participante> showParticipantsEvento(int idEvento){
+
+    public ArrayList<Participante> showParticipantsEvento(int idEvento) throws IOException, ParseException {
         ArrayList<Participante> participantes = new ArrayList<>();
-        
-        
-        return participantes;
+        String endpoint = this.url + "showParticipantsEvento.php?idEvento=" + idEvento;
+
+        String result = Request.Get(endpoint).execute().returnContent().asString();
+
+        if (!result.contains("Error")) {
+            JSONParser parser = new JSONParser();
+            Gson gson = new Gson();
+
+            JSONArray jArray = (JSONArray) parser.parse(result);
+
+            for (Object object : jArray) {
+                JSONObject jsonOB = (JSONObject) object;
+
+                byte[] fotoBytes = Base64.getDecoder().decode(jsonOB.get("foto").toString());
+
+                Participante participante = new Participante(
+                        Integer.parseInt(jsonOB.get("idParticipante").toString()),
+                        jsonOB.get("nombre").toString(),
+                        fotoBytes,
+                        jsonOB.get("numero_control").toString(),
+                        jsonOB.get("carrera").toString(),
+                        Integer.parseInt(jsonOB.get("Usuario_idUsuario").toString())
+                );
+                participantes.add(participante);
+            }
+            return participantes;
+        } else {
+            System.out.println(result);
+        }
+
+        return null;
     }
 
     // METODO

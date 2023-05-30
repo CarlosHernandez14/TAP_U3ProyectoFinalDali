@@ -7,7 +7,15 @@ package com.mycompany.tap_u3proyectofinaldali.documentos;
 import com.mycompany.data.WSManager;
 import com.mycompany.domain.Evento;
 import com.mycompany.domain.Participante;
+import java.awt.Dimension;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
+import jnafilechooser.api.JnaFileChooser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -28,14 +36,39 @@ public class CargarParticipantesForm extends javax.swing.JFrame {
     
     public CargarParticipantesForm(Evento evento) {
         initComponents();
+        this.setLocationRelativeTo(null);
         this.ws = new WSManager();
         this.evento = evento;
+        
+        this.containerParticipants.setLayout(new BoxLayout(this.containerParticipants, BoxLayout.Y_AXIS));
         
         initDatos();
     }
     
     private void initDatos(){
+        this.containerParticipants.removeAll();
         
+        
+        try {
+            this.participantes = this.ws.showParticipantsEvento(this.evento.getIdEvento());
+            
+            if (!this.participantes.isEmpty()) {
+                this.buttonCargarCsv.setVisible(false);
+            }
+            
+            for (Participante participante : participantes) {
+                PanelParticipante panelP = new PanelParticipante(participante);
+                panelP.setMaximumSize(new Dimension(450, 113));
+                this.containerParticipants.add(panelP);
+            }
+            
+            this.containerParticipants.revalidate();
+            this.containerParticipants.repaint();
+        } catch (IOException ex) {
+            Logger.getLogger(CargarParticipantesForm.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(CargarParticipantesForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -54,7 +87,7 @@ public class CargarParticipantesForm extends javax.swing.JFrame {
         buttonCargarCsv = new javax.swing.JButton();
         buttonAgregar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
         jPanel1.setBorder(new org.edisoncor.gui.util.DropShadowBorder());
@@ -85,6 +118,11 @@ public class CargarParticipantesForm extends javax.swing.JFrame {
         buttonCargarCsv.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         buttonCargarCsv.setForeground(new java.awt.Color(255, 255, 255));
         buttonCargarCsv.setText("Cargar CSV");
+        buttonCargarCsv.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonCargarCsvMouseClicked(evt);
+            }
+        });
 
         buttonAgregar.setBackground(new java.awt.Color(255, 51, 255));
         buttonAgregar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -136,6 +174,25 @@ public class CargarParticipantesForm extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonCargarCsvMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonCargarCsvMouseClicked
+        JnaFileChooser fileChooser = new JnaFileChooser();
+        
+        boolean option = fileChooser.showOpenDialog(this);
+        if (option) {
+            try {
+                String csvPath = fileChooser.getSelectedFile().toPath().toString();
+                ArrayList<Participante> participantesCSV = this.ws.leerCSV(csvPath);
+                if (this.ws.updateEvent(this.evento, participantesCSV)) {
+                    this.initDatos();
+                    JOptionPane.showMessageDialog(null, "Participantes cargados correctamente");
+                } else JOptionPane.showMessageDialog(null, "No se cargaron los participantes");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Error al cargar los participantes del CSV");
+                Logger.getLogger(CargarParticipantesForm.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_buttonCargarCsvMouseClicked
 
     /**
      * @param args the command line arguments

@@ -7,7 +7,9 @@ package com.mycompany.tap_u3proyectofinaldali.documentos;
 import com.mycompany.data.WSManager;
 import com.mycompany.domain.Director;
 import com.mycompany.domain.Evento;
+import com.mycompany.domain.Participante;
 import com.mycompany.domain.Usuario;
+import com.mycompany.tap_u3proyectofinaldali.LoginForm;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +31,7 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
     private Director director;
     
     private ArrayList<Evento> eventos;
+    private ArrayList<Participante> participantes;
     
     /**
      * Creates new form VentanaPrincipalDocumentos
@@ -56,27 +59,43 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
         
         
         this.containerEventos.setLayout(new BoxLayout(this.containerEventos, BoxLayout.Y_AXIS));
+        this.containerParticipantes.setLayout(new BoxLayout(this.containerParticipantes, BoxLayout.Y_AXIS));
         initDatos();
     }
     
     public void initDatos(){
-        System.out.println("INIT DATOS DE DOCUMENTOS");
         try {
             this.containerEventos.removeAll();
+            this.containerParticipantes.removeAll();
             // Listamos los eventos en el container
             this.eventos = this.ws.showEvents();
             
+            this.participantes = this.ws.showParticipants(null);
+            
+            for (Participante participante : participantes) {
+                PanelParticipante panelP = new PanelParticipante(participante);
+                panelP.setMaximumSize(new Dimension(600, 113));
+                this.containerParticipantes.add(panelP);
+            }
+            
+            this.containerParticipantes.revalidate();
+            this.containerParticipantes.repaint();
+            
+            
             for (Evento evento : eventos) {
-                PanelEvento panelE = new PanelEvento(evento, director);
+                PanelEvento panelE = new PanelEvento(evento, director, this);
                 panelE.setMaximumSize(new Dimension(550, 85));
                 panelE.setPreferredSize(new Dimension(575, 85));
                 this.containerEventos.add(panelE);
             }
             
+            
             this.containerEventos.revalidate();
             this.containerEventos.repaint();
             
         } catch (IOException ex) {
+            Logger.getLogger(VentanaPrincipalDocumentos.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
             Logger.getLogger(VentanaPrincipalDocumentos.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -95,10 +114,15 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         containerEventos = new javax.swing.JPanel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        jPanel2 = new javax.swing.JPanel();
+        containerParticipantes = new javax.swing.JPanel();
         buttonNuevoEvento = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         panelImage1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image-BackgroundDocs.png"))); // NOI18N
 
@@ -122,20 +146,20 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Eventos", jScrollPane1);
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        containerParticipantes.setBackground(new java.awt.Color(255, 255, 255));
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout containerParticipantesLayout = new javax.swing.GroupLayout(containerParticipantes);
+        containerParticipantes.setLayout(containerParticipantesLayout);
+        containerParticipantesLayout.setHorizontalGroup(
+            containerParticipantesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 563, Short.MAX_VALUE)
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        containerParticipantesLayout.setVerticalGroup(
+            containerParticipantesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGap(0, 402, Short.MAX_VALUE)
         );
 
-        jScrollPane2.setViewportView(jPanel2);
+        jScrollPane2.setViewportView(containerParticipantes);
 
         jTabbedPane1.addTab("Participantes", jScrollPane2);
 
@@ -189,8 +213,16 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void buttonNuevoEventoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonNuevoEventoMouseClicked
-        new CrearEventoForm(this.usuario).setVisible(true);
+        new CrearEventoForm(this.usuario, this).setVisible(true);
     }//GEN-LAST:event_buttonNuevoEventoMouseClicked
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        new LoginForm().setVisible(true);
+    }//GEN-LAST:event_formWindowClosed
+    
+    public void acutalizarVentana(){
+        this.initDatos();
+    }
     
     /**
      * @param args the command line arguments
@@ -230,7 +262,7 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton buttonNuevoEvento;
     private javax.swing.JPanel containerEventos;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel containerParticipantes;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;
