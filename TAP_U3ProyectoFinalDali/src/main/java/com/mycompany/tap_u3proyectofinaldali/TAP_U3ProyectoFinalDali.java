@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
+import jnafilechooser.api.JnaFileChooser;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -37,6 +38,28 @@ public class TAP_U3ProyectoFinalDali {
             new LoginForm().setVisible(true);
             //new CrearEventoForm(new Usuario()).setVisible(true);
             WSManager ws = new WSManager();
+            
+            
+            //File firma = new File("src/main/java/com/mycompany/images/firma-Charly.png");
+            
+            
+            //if (ws.createDirector("Charly", "Maestria", Files.readAllBytes(firma.toPath()), "charl", "ch262")) {
+            //    JOptionPane.showMessageDialog(null, "Director creado correctamente");
+            //} else {
+            //    JOptionPane.showMessageDialog(null, "Error al crear el director");
+            //}
+            //String nombre = "Octavio";
+            //String numeroCtrl = "21121553";
+            //String carrera = "Sistemas";
+            
+            //Participante p = new Participante(nombre, null, numeroCtrl, carrera);
+            
+            //String[] userData = ws.genUserData(p);
+            
+            //int idParticipante = ws.createParticipant(p, userData[0], userData[1]);
+            //if (idParticipante > 0) {
+            //    JOptionPane.showMessageDialog(null, "Se agrego el participante \n idParticipante: " + idParticipante);
+            //} else JOptionPane.showMessageDialog(null, "ERROR AL CREAR EL PARTICIPANTE");
             
             
             

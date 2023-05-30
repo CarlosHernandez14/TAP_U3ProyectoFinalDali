@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BoxLayout;
+import javax.swing.JOptionPane;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -46,8 +47,10 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
         try {
             this.director = this.ws.getActiveDirector();
         } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER EL ACTIVE DIRECTOR");
             Logger.getLogger(VentanaPrincipalDocumentos.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
+            JOptionPane.showMessageDialog(null, "ERROR AL OBTENER EL ACTIVE DIRECTOR");
             Logger.getLogger(VentanaPrincipalDocumentos.class.getName()).log(Level.SEVERE, null, ex);
         }
         
@@ -57,6 +60,7 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
     }
     
     public void initDatos(){
+        System.out.println("INIT DATOS DE DOCUMENTOS");
         try {
             this.containerEventos.removeAll();
             // Listamos los eventos en el container
@@ -96,7 +100,7 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        panelImage1.setIcon(new javax.swing.ImageIcon("C:\\Users\\charl\\Documents\\GitHub\\TAP_U3ProyectoFinalDali\\TAP_U3ProyectoFinalDali\\src\\main\\java\\com\\mycompany\\images\\image-BackgroundDocs.png")); // NOI18N
+        panelImage1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image-BackgroundDocs.png"))); // NOI18N
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
         jScrollPane1.setHorizontalScrollBarPolicy(javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

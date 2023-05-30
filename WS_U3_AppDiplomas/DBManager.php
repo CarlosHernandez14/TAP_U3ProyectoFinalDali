@@ -158,9 +158,13 @@ class DBManager {
 
 
             if ($stmt->execute()) {
+
+                // Id del participante creado
+                $idParticipante = $link->insert_id;
+
                 $stmt->close();
                 $this->close($link);
-                return true; // Éxito al dar de alta el participante
+                return $idParticipante; // Éxito al dar de alta el participante
             } else {
                 $stmt->close();
                 $this->close($link);
@@ -532,9 +536,9 @@ class DBManager {
     {
         $link = $this->open();
 
-        $sql = "SELECT p.idParticipante, p.nombre, e.nombre 
+        $sql = "SELECT p.*
                 FROM (Participante AS p INNER JOIN Item_Evento AS ie ON p.idParticipante = ie.Participante_idParticipante) 
-                INNER JOIN Evento AS e ON ie.Evento_idEvento = e.idEvento WHERE e.idEvento = 4";
+                INNER JOIN Evento AS e ON ie.Evento_idEvento = e.idEvento WHERE e.idEvento = ?";
 
         $stmt = $link->prepare($sql);
         $stmt->bind_param("i", $evento_id);
@@ -542,16 +546,20 @@ class DBManager {
         $stmt->execute();
         $result = $stmt->get_result();
 
-        $items_evento = array();
-
-        while ($row = $result->fetch_assoc()) {
-            $items_evento[] = $row;
+        if ($result) {
+            $participants = [];
+            while ($row = mysqli_fetch_assoc($result)) {
+                 // Convertir la imagen BLOB a Base64
+                $imagenBlob = $row['foto'];
+                $imagenBase64 = base64_encode($imagenBlob);
+                $row['foto'] = $imagenBase64;
+                $participants[] = $row;
+            }
+            return $participants;
+        } else {
+            $this->close($link);
+            die("Error al mostrar los participantes del evento");
         }
-
-        $stmt->close();
-        $this->close($link);
-
-        return $items_evento;
     }
 
     public function updateItemEvento($item_evento_id, $participante_id, $evento_id)

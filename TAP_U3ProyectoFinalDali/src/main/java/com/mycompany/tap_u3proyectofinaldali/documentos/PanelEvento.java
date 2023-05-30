@@ -111,13 +111,17 @@ public class PanelEvento extends javax.swing.JPanel {
         itemAddParticipants.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
         itemAddParticipants.setForeground(new java.awt.Color(255, 0, 255));
         itemAddParticipants.setText("Agregar participantes");
+        itemAddParticipants.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemAddParticipantsActionPerformed(evt);
+            }
+        });
         menuParticipantes.add(itemAddParticipants);
         menuParticipantes.add(jSeparator1);
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(new org.edisoncor.gui.util.DropShadowBorder());
 
-        buttonEliminar.setIcon(new javax.swing.ImageIcon("C:\\Users\\charl\\Documents\\GitHub\\TAP_U3ProyectoFinalDali\\TAP_U3ProyectoFinalDali\\src\\main\\java\\com\\mycompany\\images\\icon-Borrar.png")); // NOI18N
         buttonEliminar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         buttonEliminar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -163,14 +167,11 @@ public class PanelEvento extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(16, 16, 16)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelNombreEvento, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(labelNombreEvento, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(labelFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(labelHora, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addComponent(labelHora, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(21, 21, 21)
                 .addComponent(buttonParticipantes)
                 .addGap(18, 18, 18)
@@ -213,6 +214,10 @@ public class PanelEvento extends javax.swing.JPanel {
     private void buttonParticipantesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonParticipantesMouseClicked
         this.menuParticipantes.show(this.buttonParticipantes, WIDTH, this.buttonParticipantes.getHeight());
     }//GEN-LAST:event_buttonParticipantesMouseClicked
+
+    private void itemAddParticipantsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemAddParticipantsActionPerformed
+        new CargarParticipantesForm(this.evento).setVisible(true);
+    }//GEN-LAST:event_itemAddParticipantsActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

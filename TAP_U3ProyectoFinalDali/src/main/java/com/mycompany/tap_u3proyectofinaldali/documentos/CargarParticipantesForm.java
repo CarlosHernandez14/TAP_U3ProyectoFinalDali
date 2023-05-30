@@ -4,7 +4,10 @@
  */
 package com.mycompany.tap_u3proyectofinaldali.documentos;
 
+import com.mycompany.data.WSManager;
 import com.mycompany.domain.Evento;
+import com.mycompany.domain.Participante;
+import java.util.ArrayList;
 
 /**
  *
@@ -13,6 +16,9 @@ import com.mycompany.domain.Evento;
 public class CargarParticipantesForm extends javax.swing.JFrame {
     
     private Evento evento;
+    
+    private WSManager ws;
+    private ArrayList<Participante> participantes;
     /**
      * Creates new form CargarParticipantesForm
      */
@@ -22,6 +28,7 @@ public class CargarParticipantesForm extends javax.swing.JFrame {
     
     public CargarParticipantesForm(Evento evento) {
         initComponents();
+        this.ws = new WSManager();
         this.evento = evento;
         
         initDatos();

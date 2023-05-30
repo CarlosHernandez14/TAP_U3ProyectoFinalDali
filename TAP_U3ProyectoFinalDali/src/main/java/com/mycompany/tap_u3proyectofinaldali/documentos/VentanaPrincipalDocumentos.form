@@ -36,7 +36,7 @@
     <Container class="org.edisoncor.gui.panel.PanelImage" name="panelImage1">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="2" name="C:\Users\charl\Documents\GitHub\TAP_U3ProyectoFinalDali\TAP_U3ProyectoFinalDali\src\main\java\com\mycompany\images\image-BackgroundDocs.png"/>
+          <Image iconType="3" name="/image-BackgroundDocs.png"/>
         </Property>
       </Properties>
 

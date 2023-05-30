@@ -10,7 +10,9 @@ import com.google.gson.JsonDeserializer;
 import com.mycompany.domain.Director;
 import com.mycompany.domain.Evento;
 import com.mycompany.domain.Participante;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
@@ -42,6 +44,29 @@ public class WSManager {
     public WSManager() {
     }
 
+    public ArrayList<Participante> leerCSV(String archivoCSV) {
+        ArrayList<Participante> participantes = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(archivoCSV))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                System.out.println(linea);
+                String[] datos = linea.split(",");
+                String nombre = datos[0];
+                String numero_control = datos[1];
+                String carrera = datos[2];
+                // Otros atributos según tu clase "Participante"
+
+                Participante participante = new Participante(nombre, null, numero_control, carrera);
+                participantes.add(participante);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return participantes;
+    }
+
     // Metodos de operaciones de Director 
     public Director getActiveDirector() throws IOException, ParseException {
 
@@ -50,6 +75,10 @@ public class WSManager {
         System.out.println("URL: " + endpoint);
 
         String result = Request.Get(endpoint).execute().returnContent().asString();
+        
+        
+        System.out.println("DESPUES DE EJECUTAR EL RESULT");
+        System.out.println("RESULT: " + result);
 
         if (result.contains("Error") || result.contains("null")) {
             JOptionPane.showMessageDialog(null, "Error al consultar el director actual");
@@ -103,6 +132,8 @@ public class WSManager {
         String endpoint = this.url + "createEvent.php";
 
         Form form = Form.form();
+        
+        System.out.println(evento.toString());
 
         form.add("Director_idDirector", String.valueOf(evento.getDirector_idDirector()));
         form.add("Usuario_idCreador", String.valueOf(evento.getUsuario_idCreador()));
@@ -136,7 +167,7 @@ public class WSManager {
     }
 
     // No comprobado, porque aqui se manda llamar al de create item evento para cargar participantes
-    public boolean updateEvento(Evento evento) throws IOException {
+    public boolean updateEvent(Evento evento) throws IOException {
         String endpoint = this.url + "updateEvent.php";
 
         Form form = Form.form();
@@ -151,7 +182,15 @@ public class WSManager {
 
         //Mandamos los participantes com json
         Gson gson = new Gson();
-        form.add("participantes", gson.toJson(evento.getParticipantes()));
+
+        // Creamos los participantes de los eventos en la DB
+        for (Participante participante : evento.getParticipantes()) {
+            String[] userData = genUserData(participante);
+            int idParticipante = createParticipant(participante, userData[0], userData[1]);
+
+            // Creamos la relacion entre el participante y evento creando un item evento
+            createItemEvento(idParticipante, evento.getIdEvento());
+        }
 
         String resultado = Request.Post(endpoint)
                 .bodyForm(form.build())
@@ -168,6 +207,13 @@ public class WSManager {
         }
 
         return res > 0;
+    }
+
+    public String[] genUserData(Participante p) {
+        String[] data = new String[2];
+        data[0] = p.getNombre().substring(2);
+        data[1] = p.getNumero_control();
+        return data;
     }
 
     // Falta primero eliminar los items_evento para poder eliminar el evento
@@ -262,17 +308,20 @@ public class WSManager {
 
     // METODOS PARA OPERACIONES DE PARTICIPANTES EN EL WEB SERVICE
     // Funcional
-    public boolean createParticipant(Participante participante, String username, String password) throws IOException {
+    public int createParticipant(Participante participante, String username, String password) throws IOException {
         String endpoint = this.url + "createParticipant.php";
-
-        String foto64 = Base64.getEncoder().encodeToString(participante.getFoto());
 
         Form form = Form.form();
         form.add("username", username);
         form.add("password", password);
         form.add("tipo_usuario", "participante");
         form.add("nombre", participante.getNombre());
-        form.add("foto", foto64);
+
+        if (participante.getFoto() != null) {
+            String foto64 = Base64.getEncoder().encodeToString(participante.getFoto());
+            form.add("foto", foto64);
+        }
+
         form.add("numero_control", participante.getNumero_control());
         form.add("carrera", participante.getCarrera());
 
@@ -284,10 +333,10 @@ public class WSManager {
 
         if (!resultado.contains("Error")) {
             System.out.println("Participante creado correctamente.");
-            return true;
+            return Integer.parseInt(resultado);
         } else {
             System.out.println("Error al crear el participante: " + resultado);
-            return false;
+            return 0;
         }
     }
 
@@ -300,9 +349,9 @@ public class WSManager {
         } else {
             endpoint = this.url + "showParticipants.php";
         }
-        
+
         String result = Request.Get(endpoint).execute().returnContent().asString();
-        
+
         if (!result.contains("Error")) {
             JSONParser parser = new JSONParser();
             Gson gson = new Gson();
@@ -310,15 +359,15 @@ public class WSManager {
             JSONArray jArray = (JSONArray) parser.parse(result);
 
             for (Object object : jArray) {
-                JSONObject jsonOB= (JSONObject) object;
-                
+                JSONObject jsonOB = (JSONObject) object;
+
                 byte[] fotoBytes = Base64.getDecoder().decode(jsonOB.get("foto").toString());
-                
+
                 Participante participante = new Participante(
-                        Integer.parseInt(jsonOB.get("idParticipante").toString()), 
-                        jsonOB.get("nombre").toString(), 
-                        fotoBytes, 
-                        jsonOB.get("numero_control").toString(), 
+                        Integer.parseInt(jsonOB.get("idParticipante").toString()),
+                        jsonOB.get("nombre").toString(),
+                        fotoBytes,
+                        jsonOB.get("numero_control").toString(),
                         jsonOB.get("carrera").toString(),
                         Integer.parseInt(jsonOB.get("Usuario_idUsuario").toString())
                 );
@@ -332,7 +381,12 @@ public class WSManager {
         return null;
     }
     
-    
-    
+    public ArrayList<Participante> showParticipantsEvento(int idEvento){
+        ArrayList<Participante> participantes = new ArrayList<>();
+        
+        
+        return participantes;
+    }
+
     // METODO
 }

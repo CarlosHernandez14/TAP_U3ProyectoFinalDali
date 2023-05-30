@@ -144,7 +144,7 @@ public class LoginForm extends javax.swing.JFrame {
 
             String result = Request.Get(endpoint).execute().returnContent().asString();
 
-            System.out.println("RESULT=" + result);
+            //System.out.println("RESULT=" + result);
             if (result.contains("false")) {
                 JOptionPane.showMessageDialog(null, "Usuario y/o contrasena incorrectos");
                 return;
@@ -160,16 +160,21 @@ public class LoginForm extends javax.swing.JFrame {
                     json.get("tipo_usuario").toString()
             );
             
-            System.out.println(usuario.toString());
+            //System.out.println(usuario.toString());
             
-            System.out.println("TIPO DE USUARIO: " + usuario.getTipo_usuario());
+            //System.out.println("TIPO DE USUARIO: " + usuario.getTipo_usuario());
 
             switch (usuario.getTipo_usuario()) {
-                case "documentos" ->
+                case "documentos":
+                    //System.out.println("ABRIENDO VENTANA DOCUMENTOS");
                     new VentanaPrincipalDocumentos(usuario).setVisible(true);
+                    this.dispose();
+                    break;
                 //new VentanaPrincipalDirector().setVisible(true);
-                case "participante" ->
+                case "participante":
                     new VentanaPrincipalParticipante().setVisible(true);
+                    this.dispose();
+                    break;
             }
         } catch (Exception e) {
             e.printStackTrace();
