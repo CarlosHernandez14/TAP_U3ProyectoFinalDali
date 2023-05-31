@@ -35,14 +35,25 @@ public class TAP_U3ProyectoFinalDali {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
-            new LoginForm().setVisible(true);
+            //new LoginForm().setVisible(true);
             //new CrearEventoForm(new Usuario()).setVisible(true);
             WSManager ws = new WSManager();
             
             // Filtro participantes por numero de control
             
+            ArrayList<Participante> participantes = ws.showParticipants(null);
+            ArrayList<Evento> eventos = ws.showEvents();
+            Director director = ws.getActiveDirector();
+            
+            TemplateManager tm = new TemplateManager();
+            tm.crearDocCurso(participantes.get(0), eventos.get(0), director); 
+            
             
         }catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(TAP_U3ProyectoFinalDali.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(TAP_U3ProyectoFinalDali.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
             Logger.getLogger(TAP_U3ProyectoFinalDali.class.getName()).log(Level.SEVERE, null, ex);
         }
         //TemplateManager tm = new TemplateManager();

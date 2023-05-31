@@ -73,6 +73,10 @@ public class VentanaPrincipalDirector extends javax.swing.JFrame {
         }
         
     }
+    
+    public void actualizarVentana(){
+        initDatos();
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -85,6 +89,7 @@ public class VentanaPrincipalDirector extends javax.swing.JFrame {
         panelImage1 = new org.edisoncor.gui.panel.PanelImage();
         jScrollPane1 = new javax.swing.JScrollPane();
         containerEventos = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -112,6 +117,17 @@ public class VentanaPrincipalDirector extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(containerEventos);
 
+        jButton1.setBackground(new java.awt.Color(204, 0, 204));
+        jButton1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon-VerPerfilDirector.png"))); // NOI18N
+        jButton1.setText("Ver perfil");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
         panelImage1.setLayout(panelImage1Layout);
         panelImage1Layout.setHorizontalGroup(
@@ -120,11 +136,17 @@ public class VentanaPrincipalDirector extends javax.swing.JFrame {
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 666, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(20, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelImage1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButton1)
+                .addGap(32, 32, 32))
         );
         panelImage1Layout.setVerticalGroup(
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelImage1Layout.createSequentialGroup()
-                .addGap(0, 123, Short.MAX_VALUE)
+                .addGap(0, 84, Short.MAX_VALUE)
+                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 373, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -145,6 +167,10 @@ public class VentanaPrincipalDirector extends javax.swing.JFrame {
     private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
         new LoginForm().setVisible(true);
     }//GEN-LAST:event_formWindowClosed
+
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        new VentanaVerPerfil(this.activeDirector).setVisible(true);
+    }//GEN-LAST:event_jButton1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -183,6 +209,7 @@ public class VentanaPrincipalDirector extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel containerEventos;
+    private javax.swing.JButton jButton1;
     private javax.swing.JScrollPane jScrollPane1;
     private org.edisoncor.gui.panel.PanelImage panelImage1;
     // End of variables declaration//GEN-END:variables

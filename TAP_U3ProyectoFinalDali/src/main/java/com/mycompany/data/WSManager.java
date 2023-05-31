@@ -121,6 +121,25 @@ public class WSManager {
         return false;
     }
 
+    public boolean updateDirector(int directorId, String name, String degree, byte[] firma) throws IOException {
+        String endPoint = this.url + "updateDirector.php";
+
+        String base64Sig = Base64.getEncoder().encodeToString(firma);
+
+        Form form = Form.form();
+        form.add("idDirector", String.valueOf(directorId));
+        form.add("nombre", name);
+        form.add("grado", degree);
+        form.add("firma", base64Sig);
+
+        String resultado = Request.Post(endPoint).bodyForm(form.build()).execute().returnContent().asString();
+        if (resultado.equals("1")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     // Metodos de operaciones de eventos
     public boolean createEvento(Evento evento) throws IOException {
         System.out.println("");
@@ -251,18 +270,17 @@ public class WSManager {
         data[1] = p.getNumero_control();
         return data;
     }
-    
+
     public boolean validateEvent(int eventId) throws IOException {
         String endPoint = this.url + "validateEvent.php";
-        
+
         Form form = Form.form();
-        form.add("eventId", String.valueOf(eventId));
-        
+        form.add("idEvento", String.valueOf(eventId));
 
         String result = Request.Post(endPoint).bodyForm(form.build()).execute().returnContent().asString();
         return result.equals("1");
     }
-    
+
     // Falta primero eliminar los items_evento para poder eliminar el evento
     public boolean deleteEvento(int idEvento) throws IOException {
         String endpoint = this.url + "deleteEvent.php";
@@ -318,6 +336,8 @@ public class WSManager {
 
                 for (Object object : jsonArray) {
                     Evento evento = gson.fromJson(object.toString(), Evento.class);
+                    JSONObject json = (JSONObject) object;
+                    evento.setValidado(json.get("validado").toString().equals("1"));
                     eventos.add(evento);
                 }
 
@@ -344,7 +364,7 @@ public class WSManager {
                 .asString();
 
         ArrayList<Evento> events = new ArrayList<>();
-        
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeOfT, context) -> {
             LocalDate localDate = LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE);
@@ -356,8 +376,7 @@ public class WSManager {
         });
 
         Gson gson = gsonBuilder.create();
-        
-        
+
         if (!result.contains("Error")) {
             try {
                 JSONParser parser = new JSONParser();
@@ -432,6 +451,34 @@ public class WSManager {
         } else {
             System.out.println("Error al crear el participante: " + resultado);
             return 0;
+        }
+    }
+
+    public boolean updateParticipant(Participante participante) throws IOException {
+        String endpoint = this.url + "updateParticipant.php";
+        
+        String foto64 = Base64.getEncoder().encodeToString(participante.getFoto());
+        
+        Form form = Form.form();
+        form.add("numero_control", participante.getNumero_control());
+        form.add("carrera", participante.getCarrera());
+        form.add("idParticipante", String.valueOf(participante.getIdParticipante()));
+        form.add("nombre", participante.getNombre());
+
+        form.add("foto", foto64);
+        
+        String resultado = Request.Post(endpoint)
+                .bodyForm(form.build())
+                .execute()
+                .returnContent()
+                .asString();
+
+        if (!resultado.contains("Error")) {
+            System.out.println("Participante actualizado correctamente.");
+            return true;
+        } else {
+            System.out.println("Error al actualizar el participante: " + resultado);
+            return false;
         }
     }
 

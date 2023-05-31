@@ -277,13 +277,6 @@ class DBManager {
         $stmt = $link->prepare($sql);
         $stmt->bind_param("ssssi", $nombre, $foto, $numeroControl, $carrera, $id);
 
-        // Envía los datos de la foto como un blob
-        $fotoStream = fopen("php://memory", "r+");
-        fwrite($fotoStream, $foto);
-        rewind($fotoStream);
-        $stmt->send_long_data(1, stream_get_contents($fotoStream));
-        fclose($fotoStream);
-
         if ($stmt->execute()) {
             $stmt->close();
             $this->close($link);
@@ -420,28 +413,24 @@ class DBManager {
         
     }
 
-    // SOLO EDITA EL DIRECTOR NO EL USUARIO RELACIONADO
-    public function updateDirector($directorId, $grado, $firma, $nombre)
-    {
+    public function updateDirector($idDirector, $nombre, $grado, $firmaBytes) {
         $link = $this->open();
-
-        $sql = "UPDATE Director SET grado = ?, firma = ?, nombre = ? WHERE idDirector = ?";
-        $stmt = $link->prepare($sql);
-        $stmt->bind_param("sssi", $grado, $firma, $nombre, $directorId);
-
-        // Envía los datos de la firma como un blob
-        $firmaStream = fopen("php://memory", "r+");
-        fwrite($firmaStream, $firma);
-        rewind($firmaStream);
-        $stmt->send_long_data(1, stream_get_contents($firmaStream));
-        fclose($firmaStream);
-
-        $result = $stmt->execute();
-
-        $stmt->close();
-        $this->close($link);
-
-        return $result;
+    
+        $sql = "UPDATE Director SET nombre = ?, grado = ?, firma = ? WHERE idDirector = ?";
+    
+        $stmt = mysqli_prepare($link, $sql);
+    
+        mysqli_stmt_bind_param($stmt, "sssi", $nombre, $grado, $firmaBytes, $idDirector);
+    
+        if (mysqli_stmt_execute($stmt)) {
+            mysqli_stmt_close($stmt);
+            $this->close($link);
+            return true;
+        } else {
+            mysqli_stmt_close($stmt);
+            $this->close($link);
+            return false;
+        }
     }
 
     // Falta eliminar el usuario desdpues de eliminar el directo

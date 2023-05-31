@@ -10,9 +10,12 @@ import com.mycompany.domain.Evento;
 import com.mycompany.domain.Participante;
 import com.mycompany.domain.Usuario;
 import com.mycompany.tap_u3proyectofinaldali.director.VentanaPrincipalDirector;
+import com.mycompany.tap_u3proyectofinaldali.participante.VentanaPrincipalParticipante;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -29,7 +32,7 @@ import org.json.simple.parser.ParseException;
  * @author charl
  */
 public class PanelEvento extends javax.swing.JPanel {
-
+    
     private Evento evento;
     private Director director;
     private Usuario usuario;
@@ -41,6 +44,7 @@ public class PanelEvento extends javax.swing.JPanel {
 
     private VentanaPrincipalDocumentos ventanaPrincipalDocumentos;
     private VentanaPrincipalDirector ventanaPrincipalDirector;
+    private VentanaPrincipalParticipante ventanaPrincipalParticipante;
 
     private ArrayList<Participante> participants;
 
@@ -60,7 +64,7 @@ public class PanelEvento extends javax.swing.JPanel {
         this.ventanaPrincipalDocumentos = ventanaPrincipalDocumentos;
 
         try {
-            this.participants = this.ws.showParticipants(null);
+            this.participants = this.ws.showParticipantsEvento(evento.getIdEvento());
 
             if (this.participants == null) {
                 JOptionPane.showMessageDialog(null, "Error al leer los participantes");
@@ -77,6 +81,7 @@ public class PanelEvento extends javax.swing.JPanel {
     }
 
     public PanelEvento(Evento evento, Director director, VentanaPrincipalDirector ventanaPrincipalDirector, Usuario usuario) {
+        System.out.println("EL USUARIO ES DE TIPO DIRECTOR");
         initComponents();
         this.evento = evento;
         this.usuario = usuario;
@@ -99,6 +104,9 @@ public class PanelEvento extends javax.swing.JPanel {
         
         initDatos();
         
+        // No le permitimos agregar participantes
+        this.itemAddParticipants.setVisible(false);
+        
         System.out.println("ES UN USUARIO DIRECTOR");
         
         // ELiminamos todos los botones de editar y agregamos uno de validar para el director
@@ -108,6 +116,21 @@ public class PanelEvento extends javax.swing.JPanel {
         JButton buttonValidar = new JButton("Validar");
         buttonValidar.setVisible(true);
         buttonValidar.setMinimumSize(new Dimension(120, 50));
+        buttonValidar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    if (ws.validateEvent(evento.getIdEvento())) {
+                        ventanaPrincipalDirector.actualizarVentana();
+                        JOptionPane.showMessageDialog(null, "Se valido el evento");
+                    } else JOptionPane.showMessageDialog(null, "No se valido el evento");
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(null, "Error al intentar validar el evento");
+                    Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
         this.containerButtonsEdit.add(buttonValidar, BorderLayout.CENTER);
         
         
@@ -116,11 +139,43 @@ public class PanelEvento extends javax.swing.JPanel {
         
 
     }
+    
+    public PanelEvento(Evento evento, Director director, VentanaPrincipalParticipante ventanaPrincipalParticipante, Usuario usuario) {
+        initComponents();
+        this.evento = evento;
+        this.usuario = usuario;
+        this.director = director;
+        this.ws = new WSManager();
+        this.ventanaPrincipalParticipante = ventanaPrincipalParticipante;
+
+        try {
+            this.participants = this.ws.showParticipantsEvento(evento.getIdEvento());
+
+            if (this.participants == null) {
+                JOptionPane.showMessageDialog(null, "Error al leer los participantes");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        System.out.println("EL USUARIO ES UN PARTICIPANTE");
+
+        initDatos();
+        
+        this.buttonEditar.setVisible(false);
+        this.buttonEliminar.setVisible(false);
+        this.buttonStatus.setVisible(false);
+        this.buttonParticipantes.setVisible(false);
+    }
 
     private void initDatos() {
         this.labelFecha.setText(this.evento.getFecha().toString());
         this.labelHora.setText(this.evento.getHora().toString());
         this.labelNombreEvento.setText(this.evento.getNombre());
+        
+        System.out.println(this.evento.toString());
 
         if (this.evento.isValidado()) {
             this.itemStatus.setForeground(Color.GREEN);

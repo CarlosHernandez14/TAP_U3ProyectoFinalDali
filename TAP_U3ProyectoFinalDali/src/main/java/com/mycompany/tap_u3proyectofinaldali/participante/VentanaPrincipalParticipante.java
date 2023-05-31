@@ -4,7 +4,11 @@
  */
 package com.mycompany.tap_u3proyectofinaldali.participante;
 
+import com.mycompany.data.WSManager;
+import com.mycompany.domain.Evento;
 import com.mycompany.domain.Usuario;
+import java.util.ArrayList;
+import javax.swing.BoxLayout;
 
 /**
  *
@@ -13,7 +17,10 @@ import com.mycompany.domain.Usuario;
 public class VentanaPrincipalParticipante extends javax.swing.JFrame {
 
     private Usuario usuario;
+
+    private WSManager ws;
     
+    private ArrayList<Evento> eventos;
     /**
      * Creates new form VentanaPrincipalParticipante
      */
@@ -23,7 +30,20 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
     
     public VentanaPrincipalParticipante(Usuario usuario) {
         initComponents();
+        this.ws = new WSManager();
+        this.setLocationRelativeTo(null);
         this.usuario =  usuario;
+        
+        
+        this.containerEventos.setLayout(new BoxLayout(this.containerEventos, BoxLayout.Y_AXIS));
+        
+        initDatos();
+    }
+    
+    private void initDatos(){
+        this.containerEventos.removeAll();
+        
+        //this.eventos = this.ws.showEventsParticipant(this.pa)
     }
 
 
@@ -37,20 +57,43 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
     private void initComponents() {
 
         panelImage1 = new org.edisoncor.gui.panel.PanelImage();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        containerEventos = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         panelImage1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image-BackgroundParticipante.jpeg"))); // NOI18N
 
+        containerEventos.setBackground(new java.awt.Color(255, 255, 255));
+
+        javax.swing.GroupLayout containerEventosLayout = new javax.swing.GroupLayout(containerEventos);
+        containerEventos.setLayout(containerEventosLayout);
+        containerEventosLayout.setHorizontalGroup(
+            containerEventosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 588, Short.MAX_VALUE)
+        );
+        containerEventosLayout.setVerticalGroup(
+            containerEventosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 356, Short.MAX_VALUE)
+        );
+
+        jScrollPane1.setViewportView(containerEventos);
+
         javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
         panelImage1.setLayout(panelImage1Layout);
         panelImage1Layout.setHorizontalGroup(
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 846, Short.MAX_VALUE)
+            .addGroup(panelImage1Layout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(239, Short.MAX_VALUE))
         );
         panelImage1Layout.setVerticalGroup(
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 510, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelImage1Layout.createSequentialGroup()
+                .addContainerGap(136, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(16, 16, 16))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -103,6 +146,8 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel containerEventos;
+    private javax.swing.JScrollPane jScrollPane1;
     private org.edisoncor.gui.panel.PanelImage panelImage1;
     // End of variables declaration//GEN-END:variables
 }

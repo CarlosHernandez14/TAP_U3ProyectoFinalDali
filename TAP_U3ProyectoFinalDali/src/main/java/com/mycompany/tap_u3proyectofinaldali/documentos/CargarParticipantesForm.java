@@ -128,6 +128,11 @@ public class CargarParticipantesForm extends javax.swing.JFrame {
         buttonAgregar.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
         buttonAgregar.setForeground(new java.awt.Color(255, 255, 255));
         buttonAgregar.setText("Agregar");
+        buttonAgregar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonAgregarMouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -194,6 +199,13 @@ public class CargarParticipantesForm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_buttonCargarCsvMouseClicked
 
+    private void buttonAgregarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonAgregarMouseClicked
+        new VentanaAgregarParticipante(this, this.evento).setVisible(true);
+    }//GEN-LAST:event_buttonAgregarMouseClicked
+
+    public void actualizarVentana(){
+        this.initDatos();
+    }
     /**
      * @param args the command line arguments
      */

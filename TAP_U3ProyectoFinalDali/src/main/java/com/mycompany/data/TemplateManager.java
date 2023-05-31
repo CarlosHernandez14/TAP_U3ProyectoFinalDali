@@ -9,6 +9,7 @@ import com.mycompany.domain.Evento;
 import com.mycompany.domain.Participante;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.CharacterRun;
@@ -16,6 +17,7 @@ import org.apache.poi.hwpf.usermodel.Paragraph;
 import org.apache.poi.hwpf.usermodel.Range;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFPictureData;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
@@ -96,6 +98,44 @@ public class TemplateManager {
             e.printStackTrace();
         }
     }
+    
+    public void crearDocCurso(Participante participante, Evento evento, Director director){
+        try {
+            // Ruta del archivo de plantilla .dotx
+            String templatePath = this.location + "Template-Curso.docx";
+
+            // Ruta del archivo de salida
+            String outputPath = this.saveLocation + "curso.docx";
+
+             // Cargar la plantilla .dotx
+            FileInputStream templateFile = new FileInputStream(templatePath);
+            XWPFDocument document = new XWPFDocument(templateFile);
+            
+            // Reemplazar los textos deseados en todos los párrafos del documento
+            //System.out.println("PARTICIPANTE:" + participante.getNombre());
+            replaceTextInDocument(document, "$NOMBRE", participante.getNombre());
+            replaceTextInDocument(document, "$NOMBREDIRECTOR", director.getNombre());
+            replaceTextInDocument(document, "$FECHA", evento.getFecha().toString());
+            replaceTextInDocument(document, "$HORA", evento.getHora().toString());
+            replaceTextInDocument(document, "$GRADO", director.getGrado());
+            replaceTextInDocument(document, "$CARRERA", participante.getCarrera());
+            replaceTextInDocument(document, "$NUMCONTROL", participante.getNumero_control());
+
+            // Guardar el documento modificado
+            FileOutputStream outputFile = new FileOutputStream(outputPath);
+            document.write(outputFile);
+            outputFile.close(); // Cerrar el flujo de salida
+
+            // Cerrar el flujo del archivo de plantilla
+            templateFile.close();
+
+            System.out.println("Plantilla editada con éxito.");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+
     
     private static void replaceTextInDocument(XWPFDocument document, String oldText, String newText) {
         for (XWPFParagraph paragraph : document.getParagraphs()) {
