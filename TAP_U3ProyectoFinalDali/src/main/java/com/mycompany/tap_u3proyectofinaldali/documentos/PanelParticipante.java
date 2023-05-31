@@ -5,6 +5,7 @@
 package com.mycompany.tap_u3proyectofinaldali.documentos;
 
 import com.mycompany.domain.Participante;
+import java.util.Base64;
 import javax.swing.ImageIcon;
 
 /**
@@ -14,27 +15,31 @@ import javax.swing.ImageIcon;
 public class PanelParticipante extends javax.swing.JPanel {
 
     private Participante participante;
-    
+
     /**
      * Creates new form PanelParticipante
      */
     public PanelParticipante() {
         initComponents();
     }
-    
+
     public PanelParticipante(Participante participante) {
         initComponents();
         this.participante = participante;
         initDatos();
     }
-    
-    private void initDatos(){
+
+    private void initDatos() {
         this.labelNombre.setText(this.participante.getNombre());
         this.labelCarrera.setText(this.participante.getCarrera());
         this.labelNumControl.setText(this.participante.getNumero_control());
+
+        String foto64 = Base64.getEncoder().encodeToString(participante.getFoto());
         
-        this.panelFoto.setIcon(new ImageIcon(this.participante.getFoto()));
-        
+        if (!foto64.isEmpty()) {
+            this.panelFoto.setIcon(new ImageIcon(this.participante.getFoto()));
+        }
+
         this.panelFoto.revalidate();
         this.panelFoto.repaint();
     }
@@ -55,6 +60,8 @@ public class PanelParticipante extends javax.swing.JPanel {
 
         setBackground(new java.awt.Color(255, 255, 255));
         setBorder(new org.edisoncor.gui.util.DropShadowBorder());
+
+        panelFoto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image-PerfilParticipante.png"))); // NOI18N
 
         javax.swing.GroupLayout panelFotoLayout = new javax.swing.GroupLayout(panelFoto);
         panelFoto.setLayout(panelFotoLayout);

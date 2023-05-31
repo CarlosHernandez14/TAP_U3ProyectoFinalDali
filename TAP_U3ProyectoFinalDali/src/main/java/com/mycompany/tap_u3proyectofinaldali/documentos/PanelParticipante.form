@@ -64,6 +64,11 @@
   </Layout>
   <SubComponents>
     <Container class="org.edisoncor.gui.panel.PanelImage" name="panelFoto">
+      <Properties>
+        <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+          <Image iconType="3" name="/image-PerfilParticipante.png"/>
+        </Property>
+      </Properties>
 
       <Layout>
         <DimensionLayout dim="0">

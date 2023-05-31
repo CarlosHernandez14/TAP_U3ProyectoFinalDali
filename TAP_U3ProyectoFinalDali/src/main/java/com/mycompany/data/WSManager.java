@@ -251,7 +251,18 @@ public class WSManager {
         data[1] = p.getNumero_control();
         return data;
     }
+    
+    public boolean validateEvent(int eventId) throws IOException {
+        String endPoint = this.url + "validateEvent.php";
+        
+        Form form = Form.form();
+        form.add("eventId", String.valueOf(eventId));
+        
 
+        String result = Request.Post(endPoint).bodyForm(form.build()).execute().returnContent().asString();
+        return result.equals("1");
+    }
+    
     // Falta primero eliminar los items_evento para poder eliminar el evento
     public boolean deleteEvento(int idEvento) throws IOException {
         String endpoint = this.url + "deleteEvent.php";

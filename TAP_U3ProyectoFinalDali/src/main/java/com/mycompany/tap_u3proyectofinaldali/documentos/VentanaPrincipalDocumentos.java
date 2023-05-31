@@ -83,9 +83,9 @@ public class VentanaPrincipalDocumentos extends javax.swing.JFrame {
             
             
             for (Evento evento : eventos) {
-                PanelEvento panelE = new PanelEvento(evento, director, this);
-                panelE.setMaximumSize(new Dimension(550, 85));
-                panelE.setPreferredSize(new Dimension(575, 85));
+                PanelEvento panelE = new PanelEvento(evento, director, this, this.usuario);
+                panelE.setMaximumSize(new Dimension(550, 97));
+                panelE.setPreferredSize(new Dimension(575, 97));
                 this.containerEventos.add(panelE);
             }
             
