@@ -10,6 +10,8 @@ import com.mycompany.tap_u3proyectofinaldali.documentos.VentanaPrincipalDocument
 import com.mycompany.tap_u3proyectofinaldali.participante.VentanaPrincipalParticipante;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -137,8 +139,8 @@ public class LoginForm extends javax.swing.JFrame {
             String password = new String(this.passwordField.getPassword());
 
             //String url = "http://localhost/WS_U3_AppDiplomas/";
-
-            String endpoint = url + "userExist.php?username=" + username + "&password=" + password;
+            String encodedUsername = URLEncoder.encode(username, StandardCharsets.UTF_8);
+            String endpoint = url + "userExist.php?username=" + encodedUsername + "&password=" + password;
 
             System.out.println(endpoint);
 
@@ -159,11 +161,9 @@ public class LoginForm extends javax.swing.JFrame {
                     json.get("password").toString(),
                     json.get("tipo_usuario").toString()
             );
-            
-            //System.out.println(usuario.toString());
-            
-            //System.out.println("TIPO DE USUARIO: " + usuario.getTipo_usuario());
 
+            //System.out.println(usuario.toString());
+            //System.out.println("TIPO DE USUARIO: " + usuario.getTipo_usuario());
             switch (usuario.getTipo_usuario()) {
                 case "documentos":
                     //System.out.println("ABRIENDO VENTANA DOCUMENTOS");

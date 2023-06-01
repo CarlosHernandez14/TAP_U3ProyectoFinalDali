@@ -12,6 +12,9 @@ import com.mycompany.domain.Participante;
 import com.mycompany.domain.Usuario;
 import com.mycompany.tap_u3proyectofinaldali.documentos.CrearEventoForm;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.sql.Date;
@@ -24,6 +27,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import jnafilechooser.api.JnaFileChooser;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.json.simple.parser.ParseException;
 
 /**
@@ -35,49 +39,30 @@ public class TAP_U3ProyectoFinalDali {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(new FlatLightLaf());
-            //new LoginForm().setVisible(true);
+            new LoginForm().setVisible(true);
             //new CrearEventoForm(new Usuario()).setVisible(true);
             WSManager ws = new WSManager();
             
             // Filtro participantes por numero de control
             
-            ArrayList<Participante> participantes = ws.showParticipants(null);
-            ArrayList<Evento> eventos = ws.showEvents();
-            Director director = ws.getActiveDirector();
+            //ArrayList<Participante> participantes = ws.showParticipants(null);
+            //ArrayList<Evento> eventos = ws.showEvents();
+            //Director director = ws.getActiveDirector();
             
             TemplateManager tm = new TemplateManager();
-            tm.crearDocCurso(participantes.get(0), eventos.get(0), director); 
             
-            
+            String location = "src/main/java/com/mycompany/templates/";
+            // Ruta del archivo de plantilla .dotx
+            String templatePath = location + "Template-Curso.docx";
+            String saveLocation = "C:\\xampp\\htdocs\\WS_U3_AppDiplomas\\";
+
+            // Ruta del archivo de salida
+            String outputPath = saveLocation + "curso.docx";
+
+           
         }catch (UnsupportedLookAndFeelException ex) {
             Logger.getLogger(TAP_U3ProyectoFinalDali.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (IOException ex) {
-            Logger.getLogger(TAP_U3ProyectoFinalDali.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ParseException ex) {
-            Logger.getLogger(TAP_U3ProyectoFinalDali.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //TemplateManager tm = new TemplateManager();
-        //Participante p = new Participante();
-        //p.setNombre("Carlos Hernandez");
-        //Evento e = new Evento();
-        //e.setNombre("Fisica cuantica");
-        //Date fecha = Date.valueOf(LocalDate.now());
-        //e.setFecha(fecha);
-        //e.setValidado(false);
-        //tm.crearDocDiploma(p, e, new Director());
-        
-        
-        
-        //TemplateManager tm = new TemplateManager();
-        //Participante p = new Participante();
-        //p.setNombre("Carlos Hernandez");
-        //Evento e = new Evento();
-        //e.setNombre("Fisica cuantica");
-        //Date fecha = Date.valueOf(LocalDate.now());
-        //e.setFecha(fecha);
-        //e.setValidado(false);
-        
-        //tm.crearDocDiploma(p, e, new Director());
     }
     
 }

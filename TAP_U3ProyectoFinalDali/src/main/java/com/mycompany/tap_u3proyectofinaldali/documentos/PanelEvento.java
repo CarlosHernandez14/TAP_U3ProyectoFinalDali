@@ -4,6 +4,7 @@
  */
 package com.mycompany.tap_u3proyectofinaldali.documentos;
 
+import com.mycompany.data.TemplateManager;
 import com.mycompany.data.WSManager;
 import com.mycompany.domain.Director;
 import com.mycompany.domain.Evento;
@@ -32,11 +33,13 @@ import org.json.simple.parser.ParseException;
  * @author charl
  */
 public class PanelEvento extends javax.swing.JPanel {
-    
+
+    private TemplateManager tm;
+
     private Evento evento;
     private Director director;
     private Usuario usuario;
-    
+
     private String iconValido = "src/main/resources/icon-isValidado.png";
     private String iconNoValidado = "src/main/resources/icon-NoValidado.png";
 
@@ -44,7 +47,9 @@ public class PanelEvento extends javax.swing.JPanel {
 
     private VentanaPrincipalDocumentos ventanaPrincipalDocumentos;
     private VentanaPrincipalDirector ventanaPrincipalDirector;
+
     private VentanaPrincipalParticipante ventanaPrincipalParticipante;
+    private Participante participante;
 
     private ArrayList<Participante> participants;
 
@@ -57,6 +62,7 @@ public class PanelEvento extends javax.swing.JPanel {
 
     public PanelEvento(Evento evento, Director director, VentanaPrincipalDocumentos ventanaPrincipalDocumentos, Usuario usuario) {
         initComponents();
+        this.tm = new TemplateManager();
         this.evento = evento;
         this.usuario = usuario;
         this.director = director;
@@ -74,7 +80,7 @@ public class PanelEvento extends javax.swing.JPanel {
         } catch (ParseException ex) {
             Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         System.out.println("EL USUARIO ES UN DOCUMENTOS");
 
         initDatos();
@@ -84,6 +90,7 @@ public class PanelEvento extends javax.swing.JPanel {
         System.out.println("EL USUARIO ES DE TIPO DIRECTOR");
         initComponents();
         this.evento = evento;
+        this.tm = new TemplateManager();
         this.usuario = usuario;
         this.director = director;
         this.ws = new WSManager();
@@ -101,18 +108,17 @@ public class PanelEvento extends javax.swing.JPanel {
             Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        
         initDatos();
-        
+
         // No le permitimos agregar participantes
         this.itemAddParticipants.setVisible(false);
-        
+
         System.out.println("ES UN USUARIO DIRECTOR");
-        
+
         // ELiminamos todos los botones de editar y agregamos uno de validar para el director
         this.containerButtonsEdit.setLayout(new BorderLayout());
         this.containerButtonsEdit.removeAll();
-        
+
         JButton buttonValidar = new JButton("Validar");
         buttonValidar.setVisible(true);
         buttonValidar.setMinimumSize(new Dimension(120, 50));
@@ -123,28 +129,34 @@ public class PanelEvento extends javax.swing.JPanel {
                     if (ws.validateEvent(evento.getIdEvento())) {
                         ventanaPrincipalDirector.actualizarVentana();
                         JOptionPane.showMessageDialog(null, "Se valido el evento");
-                    } else JOptionPane.showMessageDialog(null, "No se valido el evento");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "No se valido el evento");
+                    }
                 } catch (IOException ex) {
                     JOptionPane.showMessageDialog(null, "Error al intentar validar el evento");
                     Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         });
-        
+
         this.containerButtonsEdit.add(buttonValidar, BorderLayout.CENTER);
-        
-        
+
         this.containerButtonsEdit.revalidate();
         this.containerButtonsEdit.repaint();
-        
 
     }
-    
-    public PanelEvento(Evento evento, Director director, VentanaPrincipalParticipante ventanaPrincipalParticipante, Usuario usuario) {
+
+    public PanelEvento(Evento evento, Director director, VentanaPrincipalParticipante ventanaPrincipalParticipante, Usuario usuario, Participante participante) {
         initComponents();
+        this.tm = new TemplateManager();
         this.evento = evento;
         this.usuario = usuario;
         this.director = director;
+        this.participante = participante;
+        //if (this.director == null) {
+        //    System.out.println("EL DIRECTOR QUE LE LLEGA AL EVENTO ES NULL");
+        //}
+
         this.ws = new WSManager();
         this.ventanaPrincipalParticipante = ventanaPrincipalParticipante;
 
@@ -159,11 +171,11 @@ public class PanelEvento extends javax.swing.JPanel {
         } catch (ParseException ex) {
             Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         System.out.println("EL USUARIO ES UN PARTICIPANTE");
 
         initDatos();
-        
+
         this.buttonEditar.setVisible(false);
         this.buttonEliminar.setVisible(false);
         this.buttonStatus.setVisible(false);
@@ -174,7 +186,7 @@ public class PanelEvento extends javax.swing.JPanel {
         this.labelFecha.setText(this.evento.getFecha().toString());
         this.labelHora.setText(this.evento.getHora().toString());
         this.labelNombreEvento.setText(this.evento.getNombre());
-        
+
         System.out.println(this.evento.toString());
 
         if (this.evento.isValidado()) {
@@ -305,6 +317,11 @@ public class PanelEvento extends javax.swing.JPanel {
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
         buttonImprimir.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon-Imprimir.png"))); // NOI18N
+        buttonImprimir.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonImprimirMouseClicked(evt);
+            }
+        });
 
         buttonParticipantes.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icon-Participantes.png"))); // NOI18N
         buttonParticipantes.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -432,6 +449,64 @@ public class PanelEvento extends javax.swing.JPanel {
     private void buttonEditarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonEditarMouseClicked
         new VentanaEditarEvento(evento, ventanaPrincipalDocumentos).setVisible(true);
     }//GEN-LAST:event_buttonEditarMouseClicked
+
+    private void buttonImprimirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonImprimirMouseClicked
+        try {
+            ArrayList<Participante> participantsEvent = this.ws.showParticipantsEvento(this.evento.getIdEvento());
+            
+            //for (Participante participante1 : participantsEvent) {
+            //    System.out.println(participante1.toString());
+            //}
+            
+            switch (this.usuario.getTipo_usuario()) {
+                case "participante":
+                    System.out.println("SE IMPRIMIRA EL DOCUMENTO DEL PARTICIPANTE");
+                    // Imprimimos solo el del participante
+                    switch (this.evento.getTipo_formato()) {
+                        case "Template-Diploma":
+                            this.tm.crearDocDiploma(participante, evento, director);
+                            break;
+                        case "Template-Conferencia":
+                            this.tm.crearDocConferencia(participante, evento, director);
+                            break;
+                        case "Template-Curso":
+                            this.tm.crearDocCurso(participante, evento, director);
+                            break;
+                        default:
+                            throw new AssertionError();
+                    }
+                    break;
+
+                default:
+                    //System.out.println("EL QUE INTENTA IMPRIMIR ES USUARIO DOCS O DIRECTOR");
+                    for (Participante participanteE : participantsEvent) {
+                        //System.out.println("PARTICIPANTE: " + participante.toString());
+                        
+                        switch (this.evento.getTipo_formato()) {
+                            case "Template-Diploma":
+                                this.tm.crearDocDiploma(participanteE, evento, director);
+                                break;
+                            case "Template-Conferencia":
+                                this.tm.crearDocConferencia(participanteE, evento, director);
+                                break;
+                            case "Template-Curso":
+                                this.tm.crearDocCurso(participanteE, evento, director);
+                                break;
+                            default:
+                                throw new AssertionError();
+                        }
+                    }
+                    break;
+            }
+
+        } catch (IOException ex) {
+            Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(PanelEvento.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }//GEN-LAST:event_buttonImprimirMouseClicked
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

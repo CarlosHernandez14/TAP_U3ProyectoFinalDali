@@ -10,6 +10,7 @@ import com.mycompany.tap_u3proyectofinaldali.director.VentanaVerPerfil;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -25,6 +26,8 @@ public class VentanaPerfilParticipante extends javax.swing.JFrame {
     private WSManager ws;
     private Participante participante;
     
+    private VentanaPrincipalParticipante ventanaPrincipalParticipante;
+    
     /**
      * Creates new form VentanaPerfilParticipante
      */
@@ -32,16 +35,17 @@ public class VentanaPerfilParticipante extends javax.swing.JFrame {
         initComponents();
     }
     
-    public VentanaPerfilParticipante(Participante participante) {
+    public VentanaPerfilParticipante(Participante participante, VentanaPrincipalParticipante ventanaPrincipalParticipante) {
         initComponents();
         this.setLocationRelativeTo(null);
         this.ws = new WSManager();
         this.participante = participante;
+        this.ventanaPrincipalParticipante = ventanaPrincipalParticipante;
         
         this.buttonCargarFoto.setVisible(false);
         this.buttonGuardar.setVisible(false);
         
-        
+        initDatos();
     }
     
     private void initDatos(){
@@ -49,7 +53,11 @@ public class VentanaPerfilParticipante extends javax.swing.JFrame {
         this.textCarrera.setText(this.participante.getCarrera());
         this.textNumControl.setText(this.participante.getNumero_control());
         
-        this.panelFoto.setIcon(new ImageIcon(this.participante.getFoto()));
+        String foto64 = Base64.getEncoder().encodeToString(participante.getFoto());
+        
+        if (!foto64.isEmpty()) {
+            this.panelFoto.setIcon(new ImageIcon(this.participante.getFoto()));
+        }
     }
 
 
@@ -76,7 +84,7 @@ public class VentanaPerfilParticipante extends javax.swing.JFrame {
         buttonGuardar = new javax.swing.JButton();
         buttonEditar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         panel1.setColorPrimario(new java.awt.Color(255, 204, 255));
         panel1.setColorSecundario(new java.awt.Color(204, 0, 204));
@@ -108,6 +116,8 @@ public class VentanaPerfilParticipante extends javax.swing.JFrame {
 
         textCarrera.setBackground(new java.awt.Color(255, 255, 255));
         textCarrera.setText("jTextField1");
+
+        panelFoto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image-PerfilParticipante.png"))); // NOI18N
 
         javax.swing.GroupLayout panelFotoLayout = new javax.swing.GroupLayout(panelFoto);
         panelFoto.setLayout(panelFotoLayout);
@@ -260,6 +270,8 @@ public class VentanaPerfilParticipante extends javax.swing.JFrame {
                 
                 // Cargamos la imagen al panelImage
                 this.panelFoto.setIcon(new ImageIcon(this.participante.getFoto()));
+                this.panelFoto.revalidate();
+                this.panelFoto.repaint();
                 
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null, "Error al cargar la foto del participante");
@@ -273,6 +285,16 @@ public class VentanaPerfilParticipante extends javax.swing.JFrame {
         this.participante.setNumero_control(this.textNumControl.getText());
         this.participante.setNombre(this.textNombre.getText());
         
+        try {
+            if (this.ws.updateParticipant(participante)) {
+                this.ventanaPrincipalParticipante.actualizarVentana();
+                this.buttonCargarFoto.setVisible(false);
+                this.buttonGuardar.setVisible(false);
+                JOptionPane.showMessageDialog(null, "Participante actualizado correctamente");
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(VentanaPerfilParticipante.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }//GEN-LAST:event_buttonGuardarMouseClicked
 

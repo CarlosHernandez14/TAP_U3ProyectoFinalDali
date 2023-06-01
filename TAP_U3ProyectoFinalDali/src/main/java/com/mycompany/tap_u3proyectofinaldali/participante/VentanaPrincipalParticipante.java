@@ -5,10 +5,19 @@
 package com.mycompany.tap_u3proyectofinaldali.participante;
 
 import com.mycompany.data.WSManager;
+import com.mycompany.domain.Director;
 import com.mycompany.domain.Evento;
+import com.mycompany.domain.Participante;
 import com.mycompany.domain.Usuario;
+import com.mycompany.tap_u3proyectofinaldali.LoginForm;
+import com.mycompany.tap_u3proyectofinaldali.documentos.PanelEvento;
+import java.awt.Dimension;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BoxLayout;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -21,6 +30,9 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
     private WSManager ws;
     
     private ArrayList<Evento> eventos;
+    
+    private Participante participante;
+    private Director activeDirector;
     /**
      * Creates new form VentanaPrincipalParticipante
      */
@@ -34,6 +46,13 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.usuario =  usuario;
         
+        try {
+            this.activeDirector = this.ws.getActiveDirector();
+        } catch (IOException ex) {
+            Logger.getLogger(VentanaPrincipalParticipante.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(VentanaPrincipalParticipante.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         this.containerEventos.setLayout(new BoxLayout(this.containerEventos, BoxLayout.Y_AXIS));
         
@@ -43,7 +62,39 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
     private void initDatos(){
         this.containerEventos.removeAll();
         
-        //this.eventos = this.ws.showEventsParticipant(this.pa)
+        try {
+            // Consultamos todos los participantes para buscar el del usuario recibido
+            ArrayList<Participante> participantes = this.ws.showParticipants(null);
+            for (Participante participante : participantes) {
+                if (participante.getUsuario_idUsuario() == this.usuario.getIdUsuario()) {
+                    this.participante = participante;
+                    break;
+                }
+            }
+            
+            System.out.println("PARTCIPANTE QUE INICIO SESION: " + participante.toString());
+            
+            this.eventos = this.ws.showEventsParticipant(this.participante.getIdParticipante());
+            
+            for (Evento evento : this.eventos) {
+                System.out.println(evento.toString());
+                PanelEvento panelE = new PanelEvento(
+                        evento, 
+                        activeDirector, 
+                        this, 
+                        usuario,
+                        this.participante
+                );
+                panelE.setMaximumSize(new Dimension(600, 97));
+                panelE.setPreferredSize(new Dimension(575, 97));
+                this.containerEventos.add(panelE);
+            }
+            
+        } catch (IOException ex) {
+            Logger.getLogger(VentanaPrincipalParticipante.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(VentanaPrincipalParticipante.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 
@@ -59,8 +110,14 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
         panelImage1 = new org.edisoncor.gui.panel.PanelImage();
         jScrollPane1 = new javax.swing.JScrollPane();
         containerEventos = new javax.swing.JPanel();
+        buttonVerPerfil = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosed(java.awt.event.WindowEvent evt) {
+                formWindowClosed(evt);
+            }
+        });
 
         panelImage1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image-BackgroundParticipante.jpeg"))); // NOI18N
 
@@ -79,19 +136,33 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
 
         jScrollPane1.setViewportView(containerEventos);
 
+        buttonVerPerfil.setBackground(new java.awt.Color(255, 0, 255));
+        buttonVerPerfil.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        buttonVerPerfil.setForeground(new java.awt.Color(255, 255, 255));
+        buttonVerPerfil.setText("Ver perfil");
+        buttonVerPerfil.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonVerPerfilMouseClicked(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelImage1Layout = new javax.swing.GroupLayout(panelImage1);
         panelImage1.setLayout(panelImage1Layout);
         panelImage1Layout.setHorizontalGroup(
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelImage1Layout.createSequentialGroup()
                 .addGap(17, 17, 17)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 590, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(buttonVerPerfil, javax.swing.GroupLayout.PREFERRED_SIZE, 99, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(239, Short.MAX_VALUE))
         );
         panelImage1Layout.setVerticalGroup(
             panelImage1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelImage1Layout.createSequentialGroup()
-                .addContainerGap(136, Short.MAX_VALUE)
+                .addContainerGap(85, Short.MAX_VALUE)
+                .addComponent(buttonVerPerfil, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 358, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(16, 16, 16))
         );
@@ -110,6 +181,17 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+        new LoginForm().setVisible(true);
+    }//GEN-LAST:event_formWindowClosed
+
+    private void buttonVerPerfilMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonVerPerfilMouseClicked
+        new VentanaPerfilParticipante(participante, this).setVisible(true);
+    }//GEN-LAST:event_buttonVerPerfilMouseClicked
+    
+    public void actualizarVentana(){
+        initDatos();
+    }
     /**
      * @param args the command line arguments
      */
@@ -146,6 +228,7 @@ public class VentanaPrincipalParticipante extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonVerPerfil;
     private javax.swing.JPanel containerEventos;
     private javax.swing.JScrollPane jScrollPane1;
     private org.edisoncor.gui.panel.PanelImage panelImage1;

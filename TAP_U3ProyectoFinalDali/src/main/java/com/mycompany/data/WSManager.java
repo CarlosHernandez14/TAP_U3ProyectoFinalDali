@@ -355,7 +355,7 @@ public class WSManager {
         String endpoint = this.url + "showEventsParticipant.php";
 
         Form form = Form.form();
-        form.add("idParticipant", String.valueOf(idParticipant));
+        form.add("idParticipante", String.valueOf(idParticipant));
 
         String result = Request.Post(endpoint)
                 .bodyForm(form.build())
@@ -385,7 +385,7 @@ public class WSManager {
                 for (Object object : jsonArray) {
                     JSONObject jsonOB = (JSONObject) object;
                     Evento event = gson.fromJson(object.toString(), Evento.class);
-
+                    event.setValidado(jsonOB.get("validado").toString().equals("1"));
                     events.add(event);
                 }
                 return events;
@@ -473,7 +473,7 @@ public class WSManager {
                 .returnContent()
                 .asString();
 
-        if (!resultado.contains("Error")) {
+        if (!resultado.contains("Error") && resultado.contains("1")) {
             System.out.println("Participante actualizado correctamente.");
             return true;
         } else {

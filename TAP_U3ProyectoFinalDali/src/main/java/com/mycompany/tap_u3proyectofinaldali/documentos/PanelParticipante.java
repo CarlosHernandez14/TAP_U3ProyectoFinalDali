@@ -34,11 +34,7 @@ public class PanelParticipante extends javax.swing.JPanel {
         this.labelCarrera.setText(this.participante.getCarrera());
         this.labelNumControl.setText(this.participante.getNumero_control());
 
-        String foto64 = Base64.getEncoder().encodeToString(participante.getFoto());
         
-        if (!foto64.isEmpty()) {
-            this.panelFoto.setIcon(new ImageIcon(this.participante.getFoto()));
-        }
 
         this.panelFoto.revalidate();
         this.panelFoto.repaint();

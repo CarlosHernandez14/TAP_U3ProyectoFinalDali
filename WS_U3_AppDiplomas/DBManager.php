@@ -273,6 +273,8 @@ class DBManager {
     {
         $link = $this->open();
 
+        //echo "id= $id, nombre = $nombre, numero_control = $numeroControl, carrera = $carrera";
+
         $sql = "UPDATE Participante SET nombre = ?, foto = ?, numero_control = ?, carrera = ? WHERE idParticipante = ?";
         $stmt = $link->prepare($sql);
         $stmt->bind_param("ssssi", $nombre, $foto, $numeroControl, $carrera, $id);
